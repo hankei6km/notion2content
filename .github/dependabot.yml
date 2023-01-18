@@ -8,8 +8,14 @@ updates:
   - package-ecosystem: 'npm'
     directory: '/' # Location of package manifests
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
     ignore:
       - dependency-name: '@types/node'
         versions: ['17.x']
         update-types: ['version-update:semver-patch']
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      # Check for updates to GitHub Actions every week
+      interval: 'weekly'
