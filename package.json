@@ -41,7 +41,7 @@
     "@swc/jest": "^0.2.24",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.1",
-    "@types/yargs": "^17.0.23",
+    "@types/yargs": "^17.0.24",
     "jest": "^29.5.0",
     "rimraf": "^4.4.1",
     "tslib": "^2.5.0",
