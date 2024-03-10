@@ -1,9 +1,10 @@
 # https://github.com/marketplace/actions/run-jest
 name: test
 on:
+  pull_request:
   push:
     branches:
-      - '**'
+      - 'main'
     tags:
       - '!v*'
 jobs:
