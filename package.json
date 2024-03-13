@@ -22,7 +22,7 @@
     "build": "npm run clean && tsc && rimraf dist/test && mv dist/src/* dist/ && rimraf dist/src",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "lint:type-check": "tsc --noEmit",
-    "clean": "rimraf \"dist/*\"",
+    "clean": "rimraf dist",
     "upgrade-interactive": "npm-check --update",
     "csb:test": "npm test -- --runInBand --watchAll"
   },
