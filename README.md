@@ -18,7 +18,7 @@ npm install -g notion2content
 ライブラリーとしてインストール。
 
 ```
-npm install --save-dev notion2content
+npm install --save notion2content
 ```
 
 ## Usage
