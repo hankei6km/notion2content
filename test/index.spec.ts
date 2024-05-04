@@ -11,14 +11,14 @@ describe('Class()', () => {
         super()
         this.client = new NotionClient(options)
       }
-      async queryDatabases(
+      queryDatabases(
         ...args: Parameters<NotionClient['databases']['query']>
-      ): Promise<ReturnType<NotionClient['databases']['query']>> {
+      ): ReturnType<NotionClient['databases']['query']> {
         return this.client.databases.query(...args)
       }
-      async listBlockChildren(
+      listBlockChildren(
         ...args: Parameters<NotionClient['blocks']['children']['list']>
-      ): Promise<ReturnType<NotionClient['blocks']['children']['list']>> {
+      ): ReturnType<NotionClient['blocks']['children']['list']> {
         return this.client.blocks.children.list(...args)
       }
     }
@@ -36,15 +36,15 @@ describe('toContent()', () => {
       constructor() {
         super()
       }
-      async queryDatabases(
+      queryDatabases(
         ...args: Parameters<NotionClient['databases']['query']>
-      ): Promise<ReturnType<NotionClient['databases']['query']>> {
+      ): ReturnType<NotionClient['databases']['query']> {
         this.queryDatabasesMock(...args)
         return {} as any
       }
-      async listBlockChildren(
+      listBlockChildren(
         ...args: Parameters<NotionClient['blocks']['children']['list']>
-      ): Promise<ReturnType<NotionClient['blocks']['children']['list']>> {
+      ): ReturnType<NotionClient['blocks']['children']['list']> {
         return {} as any
       }
     }

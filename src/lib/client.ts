@@ -9,5 +9,5 @@ export abstract class Client extends N2hClient {
   abstract queryDatabases(
     // args: WithAuth<QueryDatabaseParameters>
     ...args: Parameters<NotionClient['databases']['query']>
-  ): Promise<ReturnType<NotionClient['databases']['query']>>
+  ): ReturnType<NotionClient['databases']['query']>
 }
