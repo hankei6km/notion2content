@@ -18,14 +18,14 @@ class CliClient extends Client {
     super()
     this.client = new NotionClient(options)
   }
-  async queryDatabases(
+  queryDatabases(
     ...args: Parameters<NotionClient['databases']['query']>
-  ): Promise<ReturnType<NotionClient['databases']['query']>> {
+  ): ReturnType<NotionClient['databases']['query']> {
     return this.client.databases.query(...args)
   }
-  async listBlockChildren(
+  listBlockChildren(
     ...args: Parameters<NotionClient['blocks']['children']['list']>
-  ): Promise<ReturnType<NotionClient['blocks']['children']['list']>> {
+  ): ReturnType<NotionClient['blocks']['children']['list']> {
     return this.client.blocks.children.list(...args)
   }
 }
