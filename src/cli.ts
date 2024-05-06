@@ -5,11 +5,7 @@ import { Client as NotionClient } from '@notionhq/client'
 import { ClientOptions } from '@notionhq/client/build/src/Client'
 import { Client } from './lib/client.js'
 import { toContent } from './lib/notion2content.js'
-import {
-  toFrontmatterString,
-  toHMarkdownString,
-  toHtmlString
-} from './format.js'
+import { Format } from './format.js'
 import { ContentRaw, ToContentOpts } from './lib/types.js'
 
 class CliClient extends Client {
@@ -52,11 +48,11 @@ export async function contentToString(
   content: ContentRaw
 ): Promise<string> {
   if (saveDir && saveFormat && saveFormat !== 'json') {
-    const frontMatter = await toFrontmatterString(content)
+    const frontMatter = await Format.toFrontmatterString(content)
     if (saveFormat === 'html') {
-      return `${frontMatter}\n${await toHtmlString(content)}`
+      return `${frontMatter}\n${await Format.toHtmlString(content)}`
     } else if (saveFormat === 'md') {
-      return `${frontMatter}\n${await toHMarkdownString(content)}`
+      return `${frontMatter}\n${await Format.toHMarkdownString(content)}`
     }
   }
   return `${JSON.stringify(content)}`
