@@ -14,6 +14,9 @@ export class PropsToItems {
     // TODO: null を 0 へ変換は妥当か？
     return typeof v.number === 'number' ? v.number : 0
   }
+  protected async urlValue(v: ValueOfProperty<'url'>): Promise<PropsItemValue> {
+    return v.url !== null ? `${v.url}` : ''
+  }
   protected async selectValue(
     v: ValueOfProperty<'select'>
   ): Promise<PropsItemValue> {
@@ -50,6 +53,9 @@ export class PropsToItems {
         switch (v.type) {
           case 'number':
             ret[k] = await this.numberValue(v)
+            break
+          case 'url':
+            ret[k] = await this.urlValue(v)
             break
           case 'select':
             ret[k] = await this.selectValue(v)

@@ -30,6 +30,28 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-num': 0 })
   })
 
+  it('should convert url properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-url': {
+          id: '',
+          type: 'url',
+          url: 'https://notion.so/notiondevs'
+        }
+      })
+    ).toEqual({ 'test-url': 'https://notion.so/notiondevs' })
+    expect(
+      await propsToItems.toItems({
+        'test-url': {
+          id: '',
+          type: 'url',
+          url: null
+        }
+      })
+    ).toEqual({ 'test-url': '' })
+  })
+
   it('should convert select properties to items', async () => {
     const propsToItems = new PropsToItems()
     expect(

@@ -139,7 +139,7 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 ### Properties
 
 - [x] number - `null` は `0` へ変換される
-- [ ] url
+- [x] url - plain text へ変換される
 - [x] select - `null` はブランクへ変換される
 - [x] multi_select
 - [ ] status
