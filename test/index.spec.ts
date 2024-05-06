@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 import { Client as NotionClient } from '@notionhq/client'
 import { ClientOptions } from '@notionhq/client/build/src/Client'
-import { Client, toContent } from '../src/index.js'
+import { Client, toContent, Format } from '../src/index.js'
 
 describe('Class()', () => {
   it('should create an instance of Client', async () => {
@@ -63,5 +63,43 @@ describe('toContent()', () => {
       database_id: 'test',
       start_cursor: undefined
     })
+  })
+})
+
+describe('Format.toFrontmatterString()', () => {
+  it('should convert object to frontmatter string', async () => {
+    expect(await Format.toFrontmatterString({ id: 'test-id' })).toEqual(
+      '---\n---\n'
+    )
+    expect(
+      await Format.toFrontmatterString({
+        id: 'test-id',
+        props: { 'test-key': 'test-value' }
+      })
+    ).toEqual('---\ntest-key: test-value\n---\n')
+  })
+})
+
+describe('Format.toHtmlString()', () => {
+  it('should convert hast to html string', async () => {
+    expect(await Format.toHtmlString({ id: 'test-id' })).toEqual('')
+    expect(
+      await Format.toHtmlString({
+        id: 'test-id',
+        content: { type: 'text', value: 'test-text' }
+      })
+    ).toEqual('test-text')
+  })
+})
+
+describe('Format.toHMarkdownString()', () => {
+  it('should convert hast to markdown string', async () => {
+    expect(await Format.toHMarkdownString({ id: 'test-id' })).toEqual('')
+    expect(
+      await Format.toHMarkdownString({
+        id: 'test-id',
+        content: { type: 'text', value: 'test-text' }
+      })
+    ).toEqual('test-text\n')
   })
 })
