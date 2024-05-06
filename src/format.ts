@@ -28,56 +28,58 @@ function sanitizeTree(tree: Nodes, opts: FormatOptions): Nodes {
   return sanitize(tree, opts.sanitizeSchema || defaultSchema)
 }
 
-export async function toFrontmatterString(
-  src: ContentRaw,
-  _opts?: FormatOptions
-): Promise<string> {
-  if (src.props) {
-    const s = matter.stringify('', src.props)
-    const l = s.length - 1
-    const i = s.lastIndexOf('\n')
-    if (i === l) {
-      return s.slice(0, l)
+export namespace Format {
+  export async function toFrontmatterString(
+    src: ContentRaw,
+    _opts?: FormatOptions
+  ): Promise<string> {
+    if (src.props) {
+      const s = matter.stringify('', src.props)
+      const l = s.length - 1
+      const i = s.lastIndexOf('\n')
+      if (i === l) {
+        return s.slice(0, l)
+      }
+      // gray-matter の挙動が変更されないかぎり、ここに到達することはない
+      return s
     }
-    // gray-matter の挙動が変更されないかぎり、ここに到達することはない
-    return s
+    return '---\n---\n'
   }
-  return '---\n---\n'
-}
 
-function isNodes(content: ContentRaw['content']): content is Nodes {
-  return (
-    content !== undefined &&
-    ((content as any).type === 'root' ||
-      (content as any).type === 'element' ||
-      (content as any).type === 'text' ||
-      (content as any).type === 'comment' ||
-      (content as any).type === 'doctype')
-  )
-}
-
-export async function toHtmlString(
-  src: ContentRaw,
-  inOpts?: FormatOptions
-): Promise<string> {
-  const opts = normalizeFormatOptions(inOpts)
-  if (isNodes(src.content)) {
-    const node = sanitizeTree(src.content, opts)
-    return hastToHtml(node)
+  function isNodes(content: ContentRaw['content']): content is Nodes {
+    return (
+      content !== undefined &&
+      ((content as any).type === 'root' ||
+        (content as any).type === 'element' ||
+        (content as any).type === 'text' ||
+        (content as any).type === 'comment' ||
+        (content as any).type === 'doctype')
+    )
   }
-  return ''
-}
 
-export async function toHMarkdownString(
-  src: ContentRaw,
-  inOpts?: FormatOptions
-): Promise<string> {
-  const opts = normalizeFormatOptions(inOpts)
-  if (isNodes(src.content)) {
-    const node = sanitizeTree(src.content, opts)
-    return mdastToMarkdown(hastToMdast(node), {
-      extensions: [gfmToMarkdown()]
-    })
+  export async function toHtmlString(
+    src: ContentRaw,
+    inOpts?: FormatOptions
+  ): Promise<string> {
+    const opts = normalizeFormatOptions(inOpts)
+    if (isNodes(src.content)) {
+      const node = sanitizeTree(src.content, opts)
+      return hastToHtml(node)
+    }
+    return ''
   }
-  return ''
+
+  export async function toHMarkdownString(
+    src: ContentRaw,
+    inOpts?: FormatOptions
+  ): Promise<string> {
+    const opts = normalizeFormatOptions(inOpts)
+    if (isNodes(src.content)) {
+      const node = sanitizeTree(src.content, opts)
+      return mdastToMarkdown(hastToMdast(node), {
+        extensions: [gfmToMarkdown()]
+      })
+    }
+    return ''
+  }
 }

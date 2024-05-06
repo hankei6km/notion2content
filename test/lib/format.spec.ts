@@ -1,9 +1,4 @@
-import {
-  normalizeFormatOptions,
-  toFrontmatterString,
-  toHMarkdownString,
-  toHtmlString
-} from '../../src/format'
+import { normalizeFormatOptions, Format } from '../../src/format'
 
 describe('normalizeFormatOptions()', () => {
   it('should return normalized options', async () => {
@@ -16,9 +11,11 @@ describe('normalizeFormatOptions()', () => {
 
 describe('toFrontmatterString()', () => {
   it('should convert object to frontmatter string', async () => {
-    expect(await toFrontmatterString({ id: 'test-id' })).toEqual('---\n---\n')
+    expect(await Format.toFrontmatterString({ id: 'test-id' })).toEqual(
+      '---\n---\n'
+    )
     expect(
-      await toFrontmatterString({
+      await Format.toFrontmatterString({
         id: 'test-id',
         props: { 'test-key': 'test-value' }
       })
@@ -28,15 +25,15 @@ describe('toFrontmatterString()', () => {
 
 describe('toHtmlString()', () => {
   it('should convert hast to html string', async () => {
-    expect(await toHtmlString({ id: 'test-id' })).toEqual('')
+    expect(await Format.toHtmlString({ id: 'test-id' })).toEqual('')
     expect(
-      await toHtmlString({
+      await Format.toHtmlString({
         id: 'test-id',
         content: { type: 'text', value: 'test-text' }
       })
     ).toEqual('test-text')
     expect(
-      await toHtmlString({
+      await Format.toHtmlString({
         id: 'test-id',
         content: {
           type: 'element',
@@ -47,7 +44,7 @@ describe('toHtmlString()', () => {
       })
     ).toEqual('<a href="https://example.com"></a>')
     expect(
-      await toHtmlString({
+      await Format.toHtmlString({
         id: 'test-id',
         content: {
           type: 'element',
@@ -56,9 +53,9 @@ describe('toHtmlString()', () => {
           children: [{ type: 'text', value: 'test-text' }]
         }
       })
-    ).toEqual('<a>test-text</a>') // samitized
+    ).toEqual('<a>test-text</a>') // sanitized
     expect(
-      await toHtmlString(
+      await Format.toHtmlString(
         {
           id: 'test-id',
           content: {
@@ -76,15 +73,15 @@ describe('toHtmlString()', () => {
 
 describe('toHMarkdownString()', () => {
   it('should convert hast to markdown string', async () => {
-    expect(await toHMarkdownString({ id: 'test-id' })).toEqual('')
+    expect(await Format.toHMarkdownString({ id: 'test-id' })).toEqual('')
     expect(
-      await toHMarkdownString({
+      await Format.toHMarkdownString({
         id: 'test-id',
         content: { type: 'text', value: 'test-text' }
       })
     ).toEqual('test-text\n')
     expect(
-      await toHMarkdownString({
+      await Format.toHMarkdownString({
         id: 'test-id',
         content: {
           type: 'element',
@@ -93,9 +90,9 @@ describe('toHMarkdownString()', () => {
           children: [{ type: 'text', value: 'test-text' }]
         }
       })
-    ).toEqual('[test-text]()\n') // samitized
+    ).toEqual('[test-text]()\n') // sanitized
     expect(
-      await toHMarkdownString(
+      await Format.toHMarkdownString(
         {
           id: 'test-id',
           content: {
