@@ -30,6 +30,7 @@
     "@notionhq/client": "^2.2.15",
     "chanpuru": "^0.2.2",
     "gray-matter": "^4.0.3",
+    "hast-util-sanitize": "^5.0.1",
     "hast-util-to-mdast": "^10.1.0",
     "install": "^0.13.0",
     "mdast-util-gfm": "^3.0.0",
