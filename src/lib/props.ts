@@ -17,6 +17,11 @@ export class PropsToItems {
   protected async urlValue(v: ValueOfProperty<'url'>): Promise<PropsItemValue> {
     return v.url !== null ? `${v.url}` : ''
   }
+  protected async checkboxValue(
+    v: ValueOfProperty<'checkbox'>
+  ): Promise<PropsItemValue> {
+    return v.checkbox
+  }
   protected async selectValue(
     v: ValueOfProperty<'select'>
   ): Promise<PropsItemValue> {
@@ -56,6 +61,9 @@ export class PropsToItems {
             break
           case 'url':
             ret[k] = await this.urlValue(v)
+            break
+          case 'checkbox':
+            ret[k] = await this.checkboxValue(v)
             break
           case 'select':
             ret[k] = await this.selectValue(v)

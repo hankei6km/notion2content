@@ -146,7 +146,7 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 - [ ] date
 - [ ] email
 - [ ] phone_number
-- [ ] checkbox
+- [x] checkbox - boolean へ変換される
 - [ ] files
 - [ ] created_by
 - [ ] created_time

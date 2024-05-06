@@ -52,6 +52,28 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-url': '' })
   })
 
+  it('should convert checkbox properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-checkbox': {
+          id: '',
+          type: 'checkbox',
+          checkbox: true
+        }
+      })
+    ).toEqual({ 'test-checkbox': true })
+    expect(
+      await propsToItems.toItems({
+        'test-checkbox': {
+          id: '',
+          type: 'checkbox',
+          checkbox: false
+        }
+      })
+    ).toEqual({ 'test-checkbox': false })
+  })
+
   it('should convert select properties to items', async () => {
     const propsToItems = new PropsToItems()
     expect(
