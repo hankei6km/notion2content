@@ -37,6 +37,21 @@ export class PropsToItems {
   ): Promise<PropsItemValue> {
     return v.status !== null ? v.status.name : ''
   }
+  protected async dateValue(
+    v: ValueOfProperty<'date'>
+  ): Promise<PropsItemValue> {
+    return v.date !== null
+      ? {
+          start: v.date.start,
+          end: v.date.end !== null ? v.date.end : '',
+          time_zone: v.date.time_zone !== null ? v.date.time_zone : ''
+        }
+      : {
+          start: '',
+          end: '',
+          time_zone: ''
+        }
+  }
   protected async richTitleValue(
     v: ValueOfProperty<'title'>
   ): Promise<PropsItemValue> {
@@ -78,6 +93,9 @@ export class PropsToItems {
             break
           case 'status':
             ret[k] = await this.statusValue(v)
+            break
+          case 'date':
+            ret[k] = await this.dateValue(v)
             break
           case 'rich_text':
             ret[k] = await this.richTextValue(v)
