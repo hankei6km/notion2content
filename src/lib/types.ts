@@ -31,6 +31,13 @@ export type PropsItemValue =
       person: {
         email: string
       }
+    }
+  | {
+      name: string
+      avatar_url: string
+      person: {
+        email: string
+      }
     }[]
 
 export type PropsItem = Record<string, PropsItemValue>
