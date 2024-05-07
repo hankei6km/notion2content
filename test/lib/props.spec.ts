@@ -74,6 +74,67 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-checkbox': false })
   })
 
+  it('should convert created_by properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-created-by': {
+          id: '',
+          type: 'created_by',
+          created_by: {
+            id: 'person-id-1',
+            type: 'person',
+            name: 'hankei6km-1',
+            avatar_url: 'hankei6km-1-avatar',
+            person: { email: 'hankei6km-1-email' },
+            object: 'user'
+          }
+        }
+      })
+    ).toEqual({
+      'test-created-by': {
+        name: 'hankei6km-1',
+        avatar_url: 'hankei6km-1-avatar',
+        person: { email: 'hankei6km-1-email' }
+      }
+    })
+    expect(
+      await propsToItems.toItems({
+        'test-created-by': {
+          id: '',
+          type: 'created_by',
+          created_by: {
+            id: 'person-id-2',
+            type: 'person',
+            name: 'hankei6km-2',
+            avatar_url: null,
+            person: {},
+            object: 'user'
+          }
+        }
+      })
+    ).toEqual({
+      'test-created-by': {
+        name: 'hankei6km-2',
+        avatar_url: '',
+        person: { email: '' }
+      }
+    })
+  })
+
+  it('should convert created time properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-created-time': {
+          id: '',
+          type: 'created_time',
+          created_time: '2020-03-17T19:10:04.968Z'
+        }
+      })
+    ).toEqual({ 'test-created-time': '2020-03-17T19:10:04.968Z' })
+  })
+
   it('should convert select properties to items', async () => {
     const propsToItems = new PropsToItems()
     expect(

@@ -148,11 +148,11 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 - [x] phone_number - plain text へ変換される
 - [x] checkbox - boolean へ変換される
 - [ ] files
-- [ ] created_by
-- [ ] created_time
+- [x] created_by - [Created by property values](https://developers.notion.com/reference/property-item-object#created-by-property-values)を出力(`person` のみ対応、`null` と `undefined` は `''` へ変換される)
+- [ ] created_time - plain text へ変換される
 - [ ] last_edited_by
 - [ ] last_edited_time
-- [ ] formula
+- [x] formula
 - [x] title - plain text へ変換される
 - [x] rich_text - plain text へ変換される
 - [x] people - [People property values](https://developers.notion.com/reference/property-item-object#people-property-values)を出力(`person` のみ対応、`null` と `undefined` は `''` へ変換される)

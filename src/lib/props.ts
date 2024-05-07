@@ -52,6 +52,16 @@ export class PropsToItems {
   ): Promise<PropsItemValue> {
     return v.checkbox
   }
+  protected async createdByValue(
+    v: ValueOfProperty<'created_by'>
+  ): Promise<PropsItemValue> {
+    return userToPersonItems(v.created_by)
+  }
+  protected async createdTimeValue(
+    v: ValueOfProperty<'created_time'>
+  ): Promise<PropsItemValue> {
+    return v.created_time
+  }
   protected async selectValue(
     v: ValueOfProperty<'select'>
   ): Promise<PropsItemValue> {
@@ -129,6 +139,12 @@ export class PropsToItems {
             break
           case 'checkbox':
             ret[k] = await this.checkboxValue(v)
+            break
+          case 'created_by':
+            ret[k] = await this.createdByValue(v)
+            break
+          case 'created_time':
+            ret[k] = await this.createdTimeValue(v)
             break
           case 'select':
             ret[k] = await this.selectValue(v)
