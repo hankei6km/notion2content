@@ -1,5 +1,4 @@
 import type { Child } from 'hastscript'
-
 import { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints'
 import { ToHastOpts } from 'notion2hast/dist/lib/types'
 
@@ -26,6 +25,14 @@ export type PropsItemValue =
       end: string
       time_zone: string
     }
+  | {
+      name: string
+      avatar_url: string
+      person: {
+        email: string
+      }
+    }[]
+
 export type PropsItem = Record<string, PropsItemValue>
 
 export type ContentRaw = {

@@ -325,6 +325,54 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-rich': 'text1text2' })
   })
 
+  it('should convert people properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-people': {
+          id: '',
+          type: 'people',
+          people: [
+            {
+              id: 'person-id-1',
+              type: 'person',
+              name: 'hankei6km-1',
+              avatar_url: 'hankei6km-1-avatar',
+              person: { email: 'hankei6km-1-email' },
+              object: 'user'
+            },
+            {
+              id: 'person-id-2',
+              type: 'person',
+              name: 'hankei6km-2',
+              avatar_url: null,
+              person: {},
+              object: 'user'
+            }
+          ]
+        }
+      })
+    ).toEqual({
+      'test-people': [
+        {
+          name: 'hankei6km-1',
+          avatar_url: 'hankei6km-1-avatar',
+          person: { email: 'hankei6km-1-email' }
+        },
+        { name: 'hankei6km-2', avatar_url: '', person: { email: '' } }
+      ]
+    })
+    expect(
+      await propsToItems.toItems({
+        'test-people': {
+          id: '',
+          type: 'people',
+          people: []
+        }
+      })
+    ).toEqual({ 'test-people': [] })
+  })
+
   it('should convert relation properties to items', async () => {
     const propsToItems = new PropsToItems()
     expect(
