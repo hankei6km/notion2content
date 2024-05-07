@@ -210,6 +210,28 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-date': { start: '', end: '', time_zone: '' } })
   })
 
+  it('should convert email properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-email': {
+          id: '',
+          type: 'email',
+          email: 'hankei6km-dummy'
+        }
+      })
+    ).toEqual({ 'test-email': 'hankei6km-dummy' })
+    expect(
+      await propsToItems.toItems({
+        'test-email': {
+          id: '',
+          type: 'email',
+          email: null
+        }
+      })
+    ).toEqual({ 'test-email': '' })
+  })
+
   it('should convert title properties to items', async () => {
     const mockRichText: (text: string) => RichTextItemResponse = (text) => ({
       type: 'text',
