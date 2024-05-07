@@ -133,6 +133,32 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-multi-select': [] })
   })
 
+  it('should convert status properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-status': {
+          id: '',
+          type: 'status',
+          status: {
+            id: '',
+            color: 'blue',
+            name: 'status1'
+          }
+        }
+      })
+    ).toEqual({ 'test-status': 'status1' })
+    expect(
+      await propsToItems.toItems({
+        'test-status': {
+          id: '',
+          type: 'status',
+          status: null
+        }
+      })
+    ).toEqual({ 'test-status': '' })
+  })
+
   it('should convert title properties to items', async () => {
     const mockRichText: (text: string) => RichTextItemResponse = (text) => ({
       type: 'text',

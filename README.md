@@ -142,7 +142,7 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 - [x] url - plain text へ変換される
 - [x] select - `null` はブランクへ変換される
 - [x] multi_select
-- [ ] status
+- [x] status - plain text へ変換される
 - [ ] date
 - [ ] email
 - [ ] phone_number
