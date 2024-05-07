@@ -1,9 +1,34 @@
 import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints'
-import type { PersonUserObjectResponse } from '@notionhq/client/build/src/api-endpoints'
+import type {
+  PartialUserObjectResponse,
+  UserObjectResponse,
+  PersonUserObjectResponse
+} from '@notionhq/client/build/src/api-endpoints'
 import { PropsItem, PropsItemValue } from './types'
 
 function isPersonUserObjectResponse(v: any): v is PersonUserObjectResponse {
   return v.object === 'user' && v.type === 'person'
+}
+
+function userToPersonItems(
+  user: PartialUserObjectResponse | UserObjectResponse
+) {
+  if (isPersonUserObjectResponse(user)) {
+    return {
+      name: user.name !== null ? user.name : '',
+      avatar_url: user.avatar_url !== null ? user.avatar_url : '',
+      person: {
+        email: typeof user.person.email !== 'undefined' ? user.person.email : ''
+      }
+    }
+  }
+  return {
+    name: '',
+    avatar_url: '',
+    person: {
+      email: ''
+    }
+  }
 }
 
 type ValueOfProperty<T> = Extract<
@@ -75,24 +100,7 @@ export class PropsToItems {
   protected async peopleValue(
     v: ValueOfProperty<'people'>
   ): Promise<PropsItemValue> {
-    return v.people.map((v) => {
-      if (isPersonUserObjectResponse(v)) {
-        return {
-          name: v.name !== null ? v.name : '',
-          avatar_url: v.avatar_url !== null ? v.avatar_url : '',
-          person: {
-            email: typeof v.person.email !== 'undefined' ? v.person.email : ''
-          }
-        }
-      }
-      return {
-        name: '',
-        avatar_url: '',
-        person: {
-          email: ''
-        }
-      }
-    })
+    return v.people.map((v) => userToPersonItems(v))
   }
   protected async richTextValue(
     v: ValueOfProperty<'rich_text'>
