@@ -1,5 +1,10 @@
 import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints'
+import type { PersonUserObjectResponse } from '@notionhq/client/build/src/api-endpoints'
 import { PropsItem, PropsItemValue } from './types'
+
+function isPersonUserObjectResponse(v: any): v is PersonUserObjectResponse {
+  return v.object === 'user' && v.type === 'person'
+}
 
 type ValueOfProperty<T> = Extract<
   PageObjectResponse['properties'][string],
@@ -67,6 +72,28 @@ export class PropsToItems {
   ): Promise<PropsItemValue> {
     return v.title.reduce((prev, v) => `${prev}${v.plain_text}`, '')
   }
+  protected async peopleValue(
+    v: ValueOfProperty<'people'>
+  ): Promise<PropsItemValue> {
+    return v.people.map((v) => {
+      if (isPersonUserObjectResponse(v)) {
+        return {
+          name: v.name !== null ? v.name : '',
+          avatar_url: v.avatar_url !== null ? v.avatar_url : '',
+          person: {
+            email: typeof v.person.email !== 'undefined' ? v.person.email : ''
+          }
+        }
+      }
+      return {
+        name: '',
+        avatar_url: '',
+        person: {
+          email: ''
+        }
+      }
+    })
+  }
   protected async richTextValue(
     v: ValueOfProperty<'rich_text'>
   ): Promise<PropsItemValue> {
@@ -112,6 +139,9 @@ export class PropsToItems {
             break
           case 'phone_number':
             ret[k] = await this.phoneNumberValue(v)
+            break
+          case 'people':
+            ret[k] = await this.peopleValue(v)
             break
           case 'rich_text':
             ret[k] = await this.richTextValue(v)

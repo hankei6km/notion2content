@@ -155,7 +155,7 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 - [ ] formula
 - [x] title - plain text へ変換される
 - [x] rich_text - plain text へ変換される
-- [ ] people
+- [x] people - [People property values](https://developers.notion.com/reference/property-item-object#people-property-values)を出力(`person` のみ対応、`null` と `undefined` は `''` へ変換される)
 - [x] relation - id の配列へ変換
 - [ ] rollup
 
