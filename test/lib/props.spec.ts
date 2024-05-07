@@ -135,6 +135,67 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-created-time': '2020-03-17T19:10:04.968Z' })
   })
 
+  it('should convert last_edited_by properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-last-edited-by': {
+          id: '',
+          type: 'last_edited_by',
+          last_edited_by: {
+            id: 'person-id-1',
+            type: 'person',
+            name: 'hankei6km-1',
+            avatar_url: 'hankei6km-1-avatar',
+            person: { email: 'hankei6km-1-email' },
+            object: 'user'
+          }
+        }
+      })
+    ).toEqual({
+      'test-last-edited-by': {
+        name: 'hankei6km-1',
+        avatar_url: 'hankei6km-1-avatar',
+        person: { email: 'hankei6km-1-email' }
+      }
+    })
+    expect(
+      await propsToItems.toItems({
+        'test-last-edited-by': {
+          id: '',
+          type: 'last_edited_by',
+          last_edited_by: {
+            id: 'person-id-2',
+            type: 'person',
+            name: 'hankei6km-2',
+            avatar_url: null,
+            person: {},
+            object: 'user'
+          }
+        }
+      })
+    ).toEqual({
+      'test-last-edited-by': {
+        name: 'hankei6km-2',
+        avatar_url: '',
+        person: { email: '' }
+      }
+    })
+  })
+
+  it('should convert last_edited_time properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-last-edited-time': {
+          id: '',
+          type: 'last_edited_time',
+          last_edited_time: '2020-03-17T19:10:04.968Z'
+        }
+      })
+    ).toEqual({ 'test-last-edited-time': '2020-03-17T19:10:04.968Z' })
+  })
+
   it('should convert select properties to items', async () => {
     const propsToItems = new PropsToItems()
     expect(

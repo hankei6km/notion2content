@@ -62,6 +62,16 @@ export class PropsToItems {
   ): Promise<PropsItemValue> {
     return v.created_time
   }
+  protected async lastEditedByValue(
+    v: ValueOfProperty<'last_edited_by'>
+  ): Promise<PropsItemValue> {
+    return userToPersonItems(v.last_edited_by)
+  }
+  protected async lastEditedTimeValue(
+    v: ValueOfProperty<'last_edited_time'>
+  ): Promise<PropsItemValue> {
+    return v.last_edited_time
+  }
   protected async selectValue(
     v: ValueOfProperty<'select'>
   ): Promise<PropsItemValue> {
@@ -145,6 +155,12 @@ export class PropsToItems {
             break
           case 'created_time':
             ret[k] = await this.createdTimeValue(v)
+            break
+          case 'last_edited_by':
+            ret[k] = await this.lastEditedByValue(v)
+            break
+          case 'last_edited_time':
+            ret[k] = await this.lastEditedTimeValue(v)
             break
           case 'select':
             ret[k] = await this.selectValue(v)
