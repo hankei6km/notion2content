@@ -150,8 +150,8 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 - [ ] files
 - [x] created_by - [Created by property values](https://developers.notion.com/reference/property-item-object#created-by-property-values)を出力(`person` のみ対応、`null` と `undefined` は `''` へ変換される)
 - [ ] created_time - plain text へ変換される
-- [ ] last_edited_by
-- [ ] last_edited_time
+- [x] last_edited_by - [Last edited by property values](https://developers.notion.com/reference/property-item-object#last-edited-by-property-values)を出力(`person` のみ対応、`null` と `undefined` は `''` へ変換される)
+- [x] last_edited_time - plain text へ変換される
 - [x] formula
 - [x] title - plain text へ変換される
 - [x] rich_text - plain text へ変換される
