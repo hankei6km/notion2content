@@ -52,6 +52,11 @@ export class PropsToItems {
           time_zone: ''
         }
   }
+  protected async emailValue(
+    v: ValueOfProperty<'email'>
+  ): Promise<PropsItemValue> {
+    return v.email !== null ? v.email : ''
+  }
   protected async richTitleValue(
     v: ValueOfProperty<'title'>
   ): Promise<PropsItemValue> {
@@ -96,6 +101,9 @@ export class PropsToItems {
             break
           case 'date':
             ret[k] = await this.dateValue(v)
+            break
+          case 'email':
+            ret[k] = await this.emailValue(v)
             break
           case 'rich_text':
             ret[k] = await this.richTextValue(v)
