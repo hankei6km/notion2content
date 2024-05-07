@@ -32,6 +32,11 @@ export class PropsToItems {
   ): Promise<PropsItemValue> {
     return v.multi_select.map((v) => v.name)
   }
+  protected async statusValue(
+    v: ValueOfProperty<'status'>
+  ): Promise<PropsItemValue> {
+    return v.status !== null ? v.status.name : ''
+  }
   protected async richTitleValue(
     v: ValueOfProperty<'title'>
   ): Promise<PropsItemValue> {
@@ -70,6 +75,9 @@ export class PropsToItems {
             break
           case 'multi_select':
             ret[k] = await this.multiSelectValue(v)
+            break
+          case 'status':
+            ret[k] = await this.statusValue(v)
             break
           case 'rich_text':
             ret[k] = await this.richTextValue(v)
