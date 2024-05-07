@@ -144,8 +144,8 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 - [x] multi_select
 - [x] status - plain text へ変換される
 - [x] date - [Date property values](https://developers.notion.com/reference/property-item-object#date-property-values) を出力(`null` は '' へ変換される)
-- [ ] email
-- [ ] phone_number
+- [x] email - plain text へ変換される
+- [x] phone_number - plain text へ変換される
 - [x] checkbox - boolean へ変換される
 - [ ] files
 - [ ] created_by
