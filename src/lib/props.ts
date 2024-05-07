@@ -57,6 +57,11 @@ export class PropsToItems {
   ): Promise<PropsItemValue> {
     return v.email !== null ? v.email : ''
   }
+  protected async phoneNumberValue(
+    v: ValueOfProperty<'phone_number'>
+  ): Promise<PropsItemValue> {
+    return v.phone_number !== null ? v.phone_number : ''
+  }
   protected async richTitleValue(
     v: ValueOfProperty<'title'>
   ): Promise<PropsItemValue> {
@@ -104,6 +109,9 @@ export class PropsToItems {
             break
           case 'email':
             ret[k] = await this.emailValue(v)
+            break
+          case 'phone_number':
+            ret[k] = await this.phoneNumberValue(v)
             break
           case 'rich_text':
             ret[k] = await this.richTextValue(v)

@@ -232,6 +232,27 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-email': '' })
   })
 
+  it('should convert phone number properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-phone-number': {
+          id: '',
+          type: 'phone_number',
+          phone_number: '*dummy'
+        }
+      })
+    ).toEqual({ 'test-phone-number': '*dummy' })
+    expect(
+      await propsToItems.toItems({
+        'test-phone-number': {
+          id: '',
+          type: 'phone_number',
+          phone_number: null
+        }
+      })
+    ).toEqual({ 'test-phone-number': '' })
+  })
   it('should convert title properties to items', async () => {
     const mockRichText: (text: string) => RichTextItemResponse = (text) => ({
       type: 'text',
