@@ -16,7 +16,16 @@ export type ToContentOpts = {
   toHastOpts: Omit<ToHastOpts, 'block_id' | 'parent'>
 }
 
-export type PropsItemValue = string | number | (string | number)[] | boolean
+export type PropsItemValue =
+  | string
+  | number
+  | (string | number)[]
+  | boolean
+  | {
+      start: string
+      end: string
+      time_zone: string
+    }
 export type PropsItem = Record<string, PropsItemValue>
 
 export type ContentRaw = {

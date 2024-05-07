@@ -159,6 +159,57 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-status': '' })
   })
 
+  it('should convert date properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-date': {
+          id: '',
+          type: 'date',
+          date: {
+            start: '2020-12-08T12:00:00Z',
+            end: '2020-12-08T12:00:00Z',
+            time_zone: 'America/Los_Angeles'
+          }
+        }
+      })
+    ).toEqual({
+      'test-date': {
+        start: '2020-12-08T12:00:00Z',
+        end: '2020-12-08T12:00:00Z',
+        time_zone: 'America/Los_Angeles'
+      }
+    })
+    expect(
+      await propsToItems.toItems({
+        'test-date': {
+          id: '',
+          type: 'date',
+          date: {
+            start: '2020-12-08T12:00:00Z',
+            end: null,
+            time_zone: null
+          }
+        }
+      })
+    ).toEqual({
+      'test-date': {
+        start: '2020-12-08T12:00:00Z',
+        end: '',
+        time_zone: ''
+      }
+    })
+    expect(
+      await propsToItems.toItems({
+        'test-date': {
+          id: '',
+          type: 'date',
+          date: null
+        }
+      })
+    ).toEqual({ 'test-date': { start: '', end: '', time_zone: '' } })
+  })
+
   it('should convert title properties to items', async () => {
     const mockRichText: (text: string) => RichTextItemResponse = (text) => ({
       type: 'text',
