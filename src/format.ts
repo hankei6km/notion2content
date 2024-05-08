@@ -4,28 +4,15 @@ import { toHtml as hastToHtml } from 'hast-util-to-html'
 import { toMdast as hastToMdast } from 'hast-util-to-mdast'
 import { toMarkdown as mdastToMarkdown } from 'mdast-util-to-markdown'
 import { gfmToMarkdown } from 'mdast-util-gfm'
-import { sanitize, defaultSchema } from 'hast-util-sanitize'
-import type { Schema } from 'hast-util-sanitize'
 import { ContentRaw } from './lib/types'
 
-type FormatOptions = {
-  sanitizeSchema?: Schema | boolean
-}
+type FormatOptions = {}
 
 export function normalizeFormatOptions(opts?: FormatOptions): FormatOptions {
   if (typeof opts === 'object' && opts !== null) {
     return opts
   }
   return {}
-}
-
-function sanitizeTree(tree: Nodes, opts: FormatOptions): Nodes {
-  if (opts.sanitizeSchema === false) {
-    return tree
-  } else if (opts.sanitizeSchema === true) {
-    return sanitize(tree, defaultSchema)
-  }
-  return sanitize(tree, opts.sanitizeSchema || defaultSchema)
 }
 
 export namespace Format {
@@ -63,8 +50,7 @@ export namespace Format {
   ): Promise<string> {
     const opts = normalizeFormatOptions(inOpts)
     if (isNodes(src.content)) {
-      const node = sanitizeTree(src.content, opts)
-      return hastToHtml(node)
+      return hastToHtml(src.content)
     }
     return ''
   }
@@ -75,8 +61,7 @@ export namespace Format {
   ): Promise<string> {
     const opts = normalizeFormatOptions(inOpts)
     if (isNodes(src.content)) {
-      const node = sanitizeTree(src.content, opts)
-      return mdastToMarkdown(hastToMdast(node), {
+      return mdastToMarkdown(hastToMdast(src.content), {
         extensions: [gfmToMarkdown()]
       })
     }
