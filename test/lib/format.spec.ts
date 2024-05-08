@@ -3,9 +3,7 @@ import { normalizeFormatOptions, Format } from '../../src/format'
 describe('normalizeFormatOptions()', () => {
   it('should return normalized options', async () => {
     expect(normalizeFormatOptions()).toEqual({})
-    expect(normalizeFormatOptions({ sanitizeSchema: false })).toEqual({
-      sanitizeSchema: false
-    })
+    expect(normalizeFormatOptions({})).toEqual({})
   })
 })
 
@@ -44,17 +42,6 @@ describe('toHtmlString()', () => {
       })
     ).toEqual('<a href="https://example.com"></a>')
     expect(
-      await Format.toHtmlString({
-        id: 'test-id',
-        content: {
-          type: 'element',
-          tagName: 'a',
-          properties: { href: 'javascrpt:alert(123)' },
-          children: [{ type: 'text', value: 'test-text' }]
-        }
-      })
-    ).toEqual('<a>test-text</a>') // sanitized
-    expect(
       await Format.toHtmlString(
         {
           id: 'test-id',
@@ -65,7 +52,7 @@ describe('toHtmlString()', () => {
             children: [{ type: 'text', value: 'test-text' }]
           }
         },
-        { sanitizeSchema: false }
+        {}
       )
     ).toEqual('<a href="javascrpt:alert(123)">test-text</a>')
   })
@@ -81,17 +68,6 @@ describe('toHMarkdownString()', () => {
       })
     ).toEqual('test-text\n')
     expect(
-      await Format.toHMarkdownString({
-        id: 'test-id',
-        content: {
-          type: 'element',
-          tagName: 'a',
-          properties: { href: 'javascrpt:alert(123)' },
-          children: [{ type: 'text', value: 'test-text' }]
-        }
-      })
-    ).toEqual('[test-text]()\n') // sanitized
-    expect(
       await Format.toHMarkdownString(
         {
           id: 'test-id',
@@ -102,7 +78,7 @@ describe('toHMarkdownString()', () => {
             children: [{ type: 'text', value: 'test-text' }]
           }
         },
-        { sanitizeSchema: false }
+        {}
       )
     ).toEqual('[test-text](javascrpt:alert\\(123\\))\n')
   })
