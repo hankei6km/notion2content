@@ -7,6 +7,26 @@ import {
 } from '@notionhq/client/build/src/api-endpoints.js'
 import { PropsItem } from '../../src/lib/types.js'
 
+function getMockTree(block_id: string) {
+  return {
+    type: 'root',
+    children: [
+      {
+        type: 'element',
+        tagName: 'p',
+        children: [
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: {},
+            children: [{ type: 'text', value: `${block_id}:blockToHast` }]
+          }
+        ]
+      }
+    ]
+  }
+}
+
 jest.unstable_mockModule('../../src/lib/props.js', () => {
   const mockPropsToItemsInstance = {
     toItems:
@@ -39,13 +59,19 @@ jest.unstable_mockModule('../../src/lib/props.js', () => {
 
 jest.unstable_mockModule('notion2hast', () => {
   const mockBlockToHast =
-    jest.fn<(client: any, opts: { block_id: string }) => Promise<string>>()
+    jest.fn<
+      (
+        client: any,
+        opts: { block_id: string }
+      ) => Promise<ReturnType<typeof getMockTree>>
+    >()
   const reset = () => {
     mockBlockToHast.mockReset().mockImplementation((_client, { block_id }) => {
       if (block_id === 'reject') {
         return Promise.reject(`${block_id}:blockToHast`)
       }
-      return Promise.resolve(`${block_id}:blockToHast`)
+      //return Promise.resolve(`${block_id}:blockToHast`)
+      return Promise.resolve(getMockTree(block_id))
     })
   }
 
@@ -690,7 +716,11 @@ describe('toContent()', () => {
       res.push(i)
     }
     expect(res).toEqual([
-      { id: 'page1', props: { check: '' }, content: 'page1:blockToHast' }
+      {
+        id: 'page1',
+        props: { check: '' },
+        content: getMockTree('page1')
+      }
     ])
     expect(mockPropsToItems).toBeCalledTimes(1)
     expect(mockPropsToItemsInstance.toItems).toBeCalledTimes(1)
@@ -736,12 +766,12 @@ describe('toContent()', () => {
       {
         id: 'page1',
         props: { check: 'prop1-1,prop1-2' },
-        content: 'page1:blockToHast'
+        content: getMockTree('page1')
       },
       {
         id: 'page2',
         props: { check: 'prop2-1,prop2-2' },
-        content: 'page2:blockToHast'
+        content: getMockTree('page2')
       }
     ])
     expect(mockPropsToItems).toBeCalledTimes(1)
@@ -788,12 +818,12 @@ describe('toContent()', () => {
       {
         id: 'page1',
         props: { 'test-index': 10, check: 'prop1-1,prop1-2' },
-        content: 'page1:blockToHast'
+        content: getMockTree('page1')
       },
       {
         id: 'page2',
         props: { 'test-index': 11, check: 'prop2-1,prop2-2' },
-        content: 'page2:blockToHast'
+        content: getMockTree('page2')
       }
     ])
     expect(mockPropsToItems).toBeCalledTimes(1)
@@ -869,7 +899,7 @@ describe('toContent()', () => {
     expect(res).toEqual([
       {
         id: 'page1',
-        content: 'page1:blockToHast'
+        content: getMockTree('page1')
       }
     ])
     expect(mockPropsToItems).toBeCalledTimes(1)

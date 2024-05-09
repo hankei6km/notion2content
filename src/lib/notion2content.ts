@@ -2,6 +2,8 @@ import { Client } from './client.js'
 import { Client as N2hClient } from 'notion2hast'
 import { ContentRaw, ToContentOpts } from './types.js'
 import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints.js'
+import type { Child } from 'hastscript'
+import type { Nodes } from 'hast-util-to-mdast/lib'
 import { PropsToItems } from './props.js'
 import { Chan } from 'chanpuru'
 import { blockToHast } from 'notion2hast'
@@ -15,6 +17,17 @@ const defaultOpts: Required<ToContentOpts> = {
   query: { database_id: '' },
   toItemsOpts: { indexName: '', initialIndex: 1 },
   toHastOpts: {}
+}
+
+function isNodes(content: Child): content is Nodes {
+  return (
+    content !== undefined &&
+    ((content as any).type === 'root' ||
+      (content as any).type === 'element' ||
+      (content as any).type === 'text' ||
+      (content as any).type === 'comment' ||
+      (content as any).type === 'doctype')
+  )
 }
 
 type NormalizedOpts = Required<ToContentOpts>
@@ -113,7 +126,7 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
             }
           }
           if (outContent) {
-            q.content = await blockToHast(client as N2hClient, {
+            let content = await blockToHast(client as N2hClient, {
               block_id: page.id,
               ...opts.toHastOpts
             }).catch((e) => {
@@ -122,6 +135,21 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
               )
               return undefined
             })
+            if (err === null) {
+              if (!isNodes(content)) {
+                err = new Error(
+                  `toContent: error type of content is not Nodes, database_id:${
+                    opts.query.database_id
+                  }, page_id:${page.id}, content:${JSON.stringify(
+                    content,
+                    null,
+                    2
+                  )}`
+                )
+                content = undefined
+              }
+              q.content = content
+            }
           }
           return q
         })(page)
