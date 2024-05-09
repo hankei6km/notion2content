@@ -1,4 +1,4 @@
-import type { Child } from 'hastscript'
+import type { Nodes } from 'hast-util-to-mdast/lib'
 import { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints'
 import { ToHastOpts } from 'notion2hast/dist/lib/types'
 
@@ -45,5 +45,5 @@ export type PropsItem = Record<string, PropsItemValue>
 export type ContentRaw = {
   id: string
   props?: PropsItem
-  content?: Child
+  content?: Nodes
 }
