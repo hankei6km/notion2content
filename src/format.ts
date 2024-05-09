@@ -5,9 +5,9 @@ import { toMarkdown as mdastToMarkdown } from 'mdast-util-to-markdown'
 import { gfmToMarkdown } from 'mdast-util-gfm'
 import { ContentRaw } from './lib/types'
 
-type FormatOptions = {}
-
-export function normalizeFormatOptions(opts?: FormatOptions): FormatOptions {
+export function normalizeFormatOptions(
+  opts?: Format.FormatOptions
+): Format.FormatOptions {
   if (typeof opts === 'object' && opts !== null) {
     return opts
   }
@@ -15,6 +15,7 @@ export function normalizeFormatOptions(opts?: FormatOptions): FormatOptions {
 }
 
 export namespace Format {
+  export type FormatOptions = {}
   export async function toFrontmatterString(
     src: ContentRaw,
     _opts?: FormatOptions
