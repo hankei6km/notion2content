@@ -52,7 +52,7 @@ export async function contentToString(
     if (saveFormat === 'html') {
       return `${frontMatter}\n${await Format.toHtmlString(content)}`
     } else if (saveFormat === 'md') {
-      return `${frontMatter}\n${await Format.toHMarkdownString(content)}`
+      return `${frontMatter}\n${await Format.toMarkdownString(content)}`
     }
   }
   return `${JSON.stringify(content)}`

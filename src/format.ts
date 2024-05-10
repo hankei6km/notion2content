@@ -44,7 +44,7 @@ export namespace Format {
     return ''
   }
 
-  export async function toHMarkdownString(
+  export async function toMarkdownString(
     src: ContentRaw,
     inOpts?: FormatOptions
   ): Promise<string> {

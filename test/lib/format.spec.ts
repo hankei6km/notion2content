@@ -58,17 +58,17 @@ describe('toHtmlString()', () => {
   })
 })
 
-describe('toHMarkdownString()', () => {
+describe('toMarkdownString()', () => {
   it('should convert hast to markdown string', async () => {
-    expect(await Format.toHMarkdownString({ id: 'test-id' })).toEqual('')
+    expect(await Format.toMarkdownString({ id: 'test-id' })).toEqual('')
     expect(
-      await Format.toHMarkdownString({
+      await Format.toMarkdownString({
         id: 'test-id',
         content: { type: 'text', value: 'test-text' }
       })
     ).toEqual('test-text\n')
     expect(
-      await Format.toHMarkdownString(
+      await Format.toMarkdownString(
         {
           id: 'test-id',
           content: {
