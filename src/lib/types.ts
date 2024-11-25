@@ -1,6 +1,8 @@
-import type { Nodes } from 'hast-util-to-mdast/lib'
+import type { toMdast } from 'hast-util-to-mdast'
 import { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints'
 import { ToHastOpts } from 'notion2hast/dist/lib/types'
+
+type Nodes = Parameters<typeof toMdast>[0]
 
 export type OutputTarget = 'props' | 'content'
 
