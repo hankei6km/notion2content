@@ -3,10 +3,12 @@ import { Client as N2hClient } from 'notion2hast'
 import { ContentRaw, ToContentOpts } from './types.js'
 import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints.js'
 import type { Child } from 'hastscript'
-import type { Nodes } from 'hast-util-to-mdast/lib'
+import type { toMdast } from 'hast-util-to-mdast'
 import { PropsToItems } from './props.js'
 import { Chan } from 'chanpuru'
 import { blockToHast } from 'notion2hast'
+
+type Nodes = Parameters<typeof toMdast>[0]
 
 const defaultOpts: Required<ToContentOpts> = {
   target: ['props', 'content'],
