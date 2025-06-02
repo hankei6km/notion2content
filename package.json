@@ -34,7 +34,7 @@
     "mdast-util-gfm": "^3.0.0",
     "mdast-util-to-markdown": "^2.1.0",
     "notion2hast": "^0.1.3",
-    "yargs": "^17.7.2"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@swc/core": "^1.4.14",
