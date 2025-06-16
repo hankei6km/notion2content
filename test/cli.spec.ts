@@ -189,8 +189,8 @@ describe('cli()', () => {
         stderr
       })
     ).toEqual(0)
-    expect(mockClient).toBeCalledWith({ auth: 'test-api-key-1' })
-    expect(mockToContent).toBeCalledTimes(1)
+    expect(mockClient).toHaveBeenCalledWith({ auth: 'test-api-key-1' })
+    expect(mockToContent).toHaveBeenCalledTimes(1)
     expect(mockToContent.mock.calls[0][1]).toEqual({
       query: {
         database_id: 'test-database-id-1'
@@ -202,7 +202,7 @@ describe('cli()', () => {
         richTexttoHastOpts: { defaultClassName: undefined }
       }
     })
-    //expect(mockToHtml).toBeCalledTimes(0)
+    //expect(mockToHtml).toHaveBeenCalledTimes(0)
     expect(outData).toEqual(`{"id":"test-1"}
 `)
     expect(errData).toEqual('')
@@ -226,8 +226,8 @@ describe('cli()', () => {
         stderr
       })
     ).toEqual(0)
-    expect(mockClient).toBeCalledWith({ auth: 'test-api-key-1' })
-    expect(mockToContent).toBeCalledTimes(1)
+    expect(mockClient).toHaveBeenCalledWith({ auth: 'test-api-key-1' })
+    expect(mockToContent).toHaveBeenCalledTimes(1)
     expect(mockToContent.mock.calls[0][1]).toEqual({
       query: {
         database_id: 'test-database-id-1'
@@ -239,8 +239,8 @@ describe('cli()', () => {
         richTexttoHastOpts: { defaultClassName: undefined }
       }
     })
-    //expect(mockToHtml).toBeCalledTimes(0)
-    expect(mockWriteFile).toBeCalledTimes(1)
+    //expect(mockToHtml).toHaveBeenCalledTimes(0)
+    expect(mockWriteFile).toHaveBeenCalledTimes(1)
     expect(mockWriteFile).toHaveBeenNthCalledWith(
       1,
       'tmp/test-1.html',

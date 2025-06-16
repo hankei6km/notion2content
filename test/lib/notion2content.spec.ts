@@ -210,7 +210,7 @@ describe('fetchPages()', () => {
       res.push(i)
     }
     expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toBeCalledTimes(1)
+    expect(spyQueryDatabases).toHaveBeenCalledTimes(1)
     expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
       database_id: 'test_database'
     })
@@ -234,7 +234,7 @@ describe('fetchPages()', () => {
       res.push(i)
     }
     expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toBeCalledTimes(1)
+    expect(spyQueryDatabases).toHaveBeenCalledTimes(1)
     expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
       database_id: 'test_database'
     })
@@ -277,7 +277,7 @@ describe('fetchPages()', () => {
       res.push(i)
     }
     expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toBeCalledTimes(1)
+    expect(spyQueryDatabases).toHaveBeenCalledTimes(1)
     expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
       database_id: 'test_database'
     })
@@ -364,7 +364,7 @@ describe('fetchPages()', () => {
     expect(res).toEqual(
       mockQueryDatabase.flatMap(({ results }) => results).slice(3)
     )
-    expect(spyQueryDatabases).toBeCalledTimes(3)
+    expect(spyQueryDatabases).toHaveBeenCalledTimes(3)
     expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
       database_id: 'test_database'
     })
@@ -459,7 +459,7 @@ describe('fetchPages()', () => {
     expect(res).toEqual(
       mockQueryDatabase.flatMap(({ results }) => results).slice(3, 5)
     )
-    expect(spyQueryDatabases).toBeCalledTimes(3)
+    expect(spyQueryDatabases).toHaveBeenCalledTimes(3)
     expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
       database_id: 'test_database'
     })
@@ -551,7 +551,7 @@ describe('fetchPages()', () => {
       res.push(i)
     }
     expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toBeCalledTimes(3)
+    expect(spyQueryDatabases).toHaveBeenCalledTimes(3)
     expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
       database_id: 'test_database'
     })
@@ -646,7 +646,7 @@ describe('fetchPages()', () => {
     expect(res).toEqual(
       mockQueryDatabase.flatMap(({ results }) => results).slice(0, 3)
     )
-    expect(spyQueryDatabases).toBeCalledTimes(2)
+    expect(spyQueryDatabases).toHaveBeenCalledTimes(2)
     expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
       database_id: 'test_database'
     })
@@ -674,7 +674,7 @@ describe('fetchPages()', () => {
       for await (const i of g) {
         res.push(i)
       }
-    }).rejects.toThrowError('reject: test_database')
+    }).rejects.toThrow('reject: test_database')
   })
 })
 
@@ -694,9 +694,9 @@ describe('toContent()', () => {
       res.push(i)
     }
     expect(res).toEqual([])
-    expect(mockPropsToItems).toBeCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toBeCalledTimes(0)
-    expect(mockBlockToHast).toBeCalledTimes(0)
+    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
+    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(0)
+    expect(mockBlockToHast).toHaveBeenCalledTimes(0)
   })
 
   it('should generate content(empty properties)', async () => {
@@ -722,9 +722,9 @@ describe('toContent()', () => {
         content: getMockTree('page1')
       }
     ])
-    expect(mockPropsToItems).toBeCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toBeCalledTimes(1)
-    expect(mockBlockToHast).toBeCalledTimes(1)
+    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
+    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(1)
+    expect(mockBlockToHast).toHaveBeenCalledTimes(1)
   })
 
   it('should generate content(basic)', async () => {
@@ -774,9 +774,9 @@ describe('toContent()', () => {
         content: getMockTree('page2')
       }
     ])
-    expect(mockPropsToItems).toBeCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toBeCalledTimes(2)
-    expect(mockBlockToHast).toBeCalledTimes(2)
+    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
+    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(2)
+    expect(mockBlockToHast).toHaveBeenCalledTimes(2)
   })
 
   it('should generate content(index)', async () => {
@@ -826,9 +826,9 @@ describe('toContent()', () => {
         content: getMockTree('page2')
       }
     ])
-    expect(mockPropsToItems).toBeCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toBeCalledTimes(2)
-    expect(mockBlockToHast).toBeCalledTimes(2)
+    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
+    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(2)
+    expect(mockBlockToHast).toHaveBeenCalledTimes(2)
   })
 
   it('should generate content(target props)', async () => {
@@ -864,9 +864,9 @@ describe('toContent()', () => {
         props: { 'test-index': 10, check: 'prop1-1' }
       }
     ])
-    expect(mockPropsToItems).toBeCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toBeCalledTimes(1)
-    expect(mockBlockToHast).toBeCalledTimes(0)
+    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
+    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(1)
+    expect(mockBlockToHast).toHaveBeenCalledTimes(0)
   })
 
   it('should generate content(target contrent)', async () => {
@@ -902,9 +902,9 @@ describe('toContent()', () => {
         content: getMockTree('page1')
       }
     ])
-    expect(mockPropsToItems).toBeCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toBeCalledTimes(0)
-    expect(mockBlockToHast).toBeCalledTimes(1)
+    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
+    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(0)
+    expect(mockBlockToHast).toHaveBeenCalledTimes(1)
   })
 
   it('should reject from queryDatabase', async () => {
@@ -925,7 +925,7 @@ describe('toContent()', () => {
       for await (const i of g) {
         res.push(i)
       }
-    }).rejects.toThrowError(
+    }).rejects.toThrow(
       'toContent: error from fetchPages: Error: reject: test_database, database_id:test_database'
     )
   })
@@ -957,7 +957,7 @@ describe('toContent()', () => {
       for await (const i of g) {
         res.push(i)
       }
-    }).rejects.toThrowError(
+    }).rejects.toThrow(
       'toContent: error from propsToItems.toItems: reject:toItems, database_id:test_database, page_id:page1'
     )
   })
@@ -989,7 +989,7 @@ describe('toContent()', () => {
       for await (const i of g) {
         res.push(i)
       }
-    }).rejects.toThrowError(
+    }).rejects.toThrow(
       'toContent: error from blockToHast: reject:blockToHast, database_id:test_database, page_id:reject'
     )
   })
