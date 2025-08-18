@@ -28,6 +28,7 @@ export type PropsItemValue =
       time_zone: string
     }
   | {
+      // user
       name: string
       avatar_url: string
       person: {
@@ -35,11 +36,20 @@ export type PropsItemValue =
       }
     }
   | {
+      // user(array)
       name: string
       avatar_url: string
       person: {
         email: string
       }
+    }[]
+  | {
+      // group
+      name: string
+    }
+  | {
+      // group(array)
+      name: string
     }[]
 
 export type PropsItem = Record<string, PropsItemValue>

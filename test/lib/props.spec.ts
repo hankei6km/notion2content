@@ -447,6 +447,52 @@ describe('propsToItems()', () => {
     ).toEqual({ 'test-rich': 'text1text2' })
   })
 
+  it('should convert group properties to items', async () => {
+    const propsToItems = new PropsToItems()
+    expect(
+      await propsToItems.toItems({
+        'test-group': {
+          id: '',
+          type: 'people',
+          people: [
+            {
+              id: 'person-id-1',
+              name: 'hankei6km-grp-1',
+              object: 'group'
+            },
+            {
+              id: 'person-id-2',
+              name: 'hankei6km-grp-2',
+              object: 'group'
+            }
+          ]
+        }
+      })
+    ).toEqual({
+      'test-group': [
+        {
+          name: 'hankei6km-grp-1'
+        },
+        { name: 'hankei6km-grp-2' }
+      ]
+    })
+    expect(
+      await propsToItems.toItems({
+        'test-group': {
+          id: '',
+          type: 'people',
+          people: [
+            {
+              id: 'person-id-1',
+              name: null,
+              object: 'group'
+            }
+          ]
+        }
+      })
+    ).toEqual({ 'test-group': [{ name: '' }] })
+  })
+
   it('should convert people properties to items', async () => {
     const propsToItems = new PropsToItems()
     expect(
