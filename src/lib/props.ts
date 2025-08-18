@@ -2,7 +2,8 @@ import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints'
 import type {
   PartialUserObjectResponse,
   UserObjectResponse,
-  PersonUserObjectResponse
+  PersonUserObjectResponse,
+  GroupObjectResponse
 } from '@notionhq/client/build/src/api-endpoints'
 import { PropsItem, PropsItemValue } from './types'
 
@@ -11,7 +12,7 @@ function isPersonUserObjectResponse(v: any): v is PersonUserObjectResponse {
 }
 
 function userToPersonItems(
-  user: PartialUserObjectResponse | UserObjectResponse
+  user: PartialUserObjectResponse | UserObjectResponse | GroupObjectResponse
 ) {
   if (isPersonUserObjectResponse(user)) {
     return {
@@ -20,6 +21,11 @@ function userToPersonItems(
       person: {
         email: typeof user.person.email !== 'undefined' ? user.person.email : ''
       }
+    }
+  }
+  if (user.object === 'group') {
+    return {
+      name: user.name !== null ? user.name : ''
     }
   }
   return {
