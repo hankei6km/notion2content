@@ -31,7 +31,7 @@
     "csb:test": "npm test -- --runInBand --watchAll"
   },
   "dependencies": {
-    "@notionhq/client": "^4.0.0",
+    "@notionhq/client": "^5.9.0",
     "chanpuru": "^0.2.2",
     "gray-matter": "^4.0.3",
     "hast-util-to-mdast": "^10.1.0",
