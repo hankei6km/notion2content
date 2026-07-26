@@ -5,7 +5,7 @@
   "author": "hankei6km <hankei6km@gmail.com> (https://github.com/hankei6km)",
   "repository": {
     "type": "git",
-    "url": "git@github.com:hankei6km/notion2content.git"
+    "url": "git+https://github.com/hankei6km/notion2content.git"
   },
   "license": "MIT",
   "main": "dist/index.js",
