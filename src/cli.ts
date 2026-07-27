@@ -2,11 +2,11 @@ import { Writable } from 'node:stream'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Client as NotionClient } from '@notionhq/client'
-import { ClientOptions } from '@notionhq/client/build/src/Client'
-import { Client } from './lib/client.js'
-import { toContent } from './lib/notion2content.js'
-import { Format } from './format/index.js'
-import { ContentRaw, ToContentOpts } from './lib/types.js'
+import type { ClientOptions } from '@notionhq/client/build/src/Client.d.ts'
+import { Client } from './lib/client.ts'
+import { toContent } from './lib/notion2content.ts'
+import { Format } from './format/index.ts'
+import type { ContentRaw, ToContentOpts } from './lib/types.ts'
 
 class CliClient extends Client {
   private client: NotionClient

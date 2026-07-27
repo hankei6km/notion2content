@@ -1,37 +1,43 @@
-import { Format } from '../../src/format/index.js'
-import { normalizeFormatOptions } from '../../src/format/internal.js'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
+
+import { Format } from '../../src/format/index.ts'
+import { normalizeFormatOptions } from '../../src/format/internal.ts'
 
 describe('normalizeFormatOptions()', () => {
   it('should return normalized options', async () => {
-    expect(normalizeFormatOptions()).toEqual({})
-    expect(normalizeFormatOptions({})).toEqual({})
+    assert.deepStrictEqual(normalizeFormatOptions(), {})
+    assert.deepStrictEqual(normalizeFormatOptions({}), {})
   })
 })
 
 describe('toFrontmatterString()', () => {
   it('should convert object to frontmatter string', async () => {
-    expect(await Format.toFrontmatterString({ id: 'test-id' })).toEqual(
+    assert.strictEqual(
+      await Format.toFrontmatterString({ id: 'test-id' }),
       '---\n---\n'
     )
-    expect(
+    assert.strictEqual(
       await Format.toFrontmatterString({
         id: 'test-id',
         props: { 'test-key': 'test-value' }
-      })
-    ).toEqual('---\ntest-key: test-value\n---\n')
+      }),
+      '---\ntest-key: test-value\n---\n'
+    )
   })
 })
 
 describe('toHtmlString()', () => {
   it('should convert hast to html string', async () => {
-    expect(await Format.toHtmlString({ id: 'test-id' })).toEqual('')
-    expect(
+    assert.strictEqual(await Format.toHtmlString({ id: 'test-id' }), '')
+    assert.strictEqual(
       await Format.toHtmlString({
         id: 'test-id',
         content: { type: 'text', value: 'test-text' }
-      })
-    ).toEqual('test-text')
-    expect(
+      }),
+      'test-text'
+    )
+    assert.strictEqual(
       await Format.toHtmlString({
         id: 'test-id',
         content: {
@@ -40,9 +46,10 @@ describe('toHtmlString()', () => {
           properties: { href: 'https://example.com' },
           children: []
         }
-      })
-    ).toEqual('<a href="https://example.com"></a>')
-    expect(
+      }),
+      '<a href="https://example.com"></a>'
+    )
+    assert.strictEqual(
       await Format.toHtmlString(
         {
           id: 'test-id',
@@ -54,21 +61,23 @@ describe('toHtmlString()', () => {
           }
         },
         {}
-      )
-    ).toEqual('<a href="javascrpt:alert(123)">test-text</a>')
+      ),
+      '<a href="javascrpt:alert(123)">test-text</a>'
+    )
   })
 })
 
 describe('toMarkdownString()', () => {
   it('should convert hast to markdown string', async () => {
-    expect(await Format.toMarkdownString({ id: 'test-id' })).toEqual('')
-    expect(
+    assert.strictEqual(await Format.toMarkdownString({ id: 'test-id' }), '')
+    assert.strictEqual(
       await Format.toMarkdownString({
         id: 'test-id',
         content: { type: 'text', value: 'test-text' }
-      })
-    ).toEqual('test-text\n')
-    expect(
+      }),
+      'test-text\n'
+    )
+    assert.strictEqual(
       await Format.toMarkdownString(
         {
           id: 'test-id',
@@ -80,7 +89,8 @@ describe('toMarkdownString()', () => {
           }
         },
         {}
-      )
-    ).toEqual('[test-text](javascrpt:alert\\(123\\))\n')
+      ),
+      '[test-text](javascrpt:alert\\(123\\))\n'
+    )
   })
 })

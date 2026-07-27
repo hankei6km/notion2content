@@ -1,7 +1,10 @@
-import { jest } from '@jest/globals'
+import { describe, it } from 'node:test'
+import assert from 'node:assert/strict'
+
 import { Client as NotionClient } from '@notionhq/client'
-import { ClientOptions } from '@notionhq/client/build/src/Client'
-import { Client, toContent, Format } from '../src/index.js'
+import type { ClientOptions } from '@notionhq/client/build/src/Client.d.ts'
+
+import { Client, toContent, Format } from '../src/index.ts'
 
 describe('Class()', () => {
   it('should create an instance of Client', async () => {
@@ -23,16 +26,16 @@ describe('Class()', () => {
       }
     }
     const client = new CliClient()
-    expect(client).toBeInstanceOf(Client)
-    expect(client.listBlockChildren).toBeInstanceOf(Function)
-    expect(client.queryDatabases).toBeInstanceOf(Function)
+    assert.ok(client instanceof Client)
+    assert.strictEqual(typeof client.listBlockChildren, 'function')
+    assert.strictEqual(typeof client.queryDatabases, 'function')
   })
 })
 
 describe('toContent()', () => {
-  it('should use a Client instance in toContent()', async () => {
+  it('should use a Client instance in toContent()', async (t) => {
     class MockClient extends Client {
-      public queryDatabasesMock = jest.fn()
+      public queryDatabasesMock = t.mock.fn()
       constructor() {
         super()
       }
@@ -58,48 +61,55 @@ describe('toContent()', () => {
       toHastOpts: {}
     })
     const res = await ite.next()
-    expect(res).toEqual({ done: true, value: undefined })
-    expect(client.queryDatabasesMock).toHaveBeenCalledWith({
-      database_id: 'test',
-      start_cursor: undefined
-    })
+    assert.deepStrictEqual(res, { done: true, value: undefined })
+    assert.deepStrictEqual(
+      client.queryDatabasesMock.mock.calls[0].arguments[0],
+      {
+        database_id: 'test'
+        // start_cursor: undefined // 最初の呼び出しでは start_cursor は定義されていない
+      }
+    )
   })
 })
 
 describe('Format.toFrontmatterString()', () => {
   it('should convert object to frontmatter string', async () => {
-    expect(await Format.toFrontmatterString({ id: 'test-id' })).toEqual(
+    assert.strictEqual(
+      await Format.toFrontmatterString({ id: 'test-id' }),
       '---\n---\n'
     )
-    expect(
+    assert.strictEqual(
       await Format.toFrontmatterString({
         id: 'test-id',
         props: { 'test-key': 'test-value' }
-      })
-    ).toEqual('---\ntest-key: test-value\n---\n')
+      }),
+      '---\ntest-key: test-value\n---\n'
+    )
   })
 })
 
 describe('Format.toHtmlString()', () => {
   it('should convert hast to html string', async () => {
-    expect(await Format.toHtmlString({ id: 'test-id' })).toEqual('')
-    expect(
+    assert.strictEqual(await Format.toHtmlString({ id: 'test-id' }), '')
+    assert.strictEqual(
       await Format.toHtmlString({
         id: 'test-id',
         content: { type: 'text', value: 'test-text' }
-      })
-    ).toEqual('test-text')
+      }),
+      'test-text'
+    )
   })
 })
 
 describe('Format.toMarkdownString()', () => {
   it('should convert hast to markdown string', async () => {
-    expect(await Format.toMarkdownString({ id: 'test-id' })).toEqual('')
-    expect(
+    assert.strictEqual(await Format.toMarkdownString({ id: 'test-id' }), '')
+    assert.strictEqual(
       await Format.toMarkdownString({
         id: 'test-id',
         content: { type: 'text', value: 'test-text' }
-      })
-    ).toEqual('test-text\n')
+      }),
+      'test-text\n'
+    )
   })
 })

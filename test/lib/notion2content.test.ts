@@ -1,11 +1,14 @@
-import { jest } from '@jest/globals'
-import { Client } from '../../src/lib/client.js'
+import type { Mock } from 'node:test'
+import { describe, it, mock, afterEach } from 'node:test'
+import assert from 'node:assert/strict'
+
+import { Client } from '../../src/lib/client.ts'
 import { Client as NotionClient } from '@notionhq/client'
-import {
+import type {
   PageObjectResponse,
   QueryDatabaseResponse
-} from '@notionhq/client/build/src/api-endpoints.js'
-import { PropsItem } from '../../src/lib/types.js'
+} from '@notionhq/client/build/src/api-endpoints.d.ts'
+import type { PropsItem } from '../../src/lib/types.ts'
 
 function getMockTree(block_id: string) {
   return {
@@ -27,23 +30,24 @@ function getMockTree(block_id: string) {
   }
 }
 
-jest.unstable_mockModule('../../src/lib/props.js', () => {
+const mockPropsExports = (() => {
   const mockPropsToItemsInstance = {
     toItems:
-      jest.fn<(props: PageObjectResponse['properties']) => Promise<PropsItem>>()
+      mock.fn<(props: PageObjectResponse['properties']) => Promise<PropsItem>>()
   }
-  const mockPropsToItems = jest.fn()
+  const mockPropsToItems = mock.fn(function () {})
   const reset = () => {
-    mockPropsToItemsInstance.toItems.mockReset().mockImplementation((props) => {
+    mockPropsToItemsInstance.toItems.mock.resetCalls()
+    mockPropsToItemsInstance.toItems.mock.mockImplementation((props) => {
       const keys = Object.keys(props).sort()
       if (keys.includes('reject')) {
         return Promise.reject(`${keys.join(',')}:toItems`)
       }
       return Promise.resolve({ check: `${keys.join(',')}` })
     })
-    mockPropsToItems.mockReset().mockImplementation(() => {
-      return mockPropsToItemsInstance
-    })
+    mockPropsToItems.mock.resetCalls()
+    mockPropsToItems.prototype.toItems = mockPropsToItemsInstance.toItems
+    mockPropsToItems.mock.mockImplementation(function () {})
   }
 
   reset()
@@ -55,18 +59,22 @@ jest.unstable_mockModule('../../src/lib/props.js', () => {
       mockPropsToItems
     })
   }
+})()
+mock.module('../../src/lib/props.ts', {
+  exports: mockPropsExports
 })
 
-jest.unstable_mockModule('notion2hast', () => {
+const mockNotion2HastExports = (() => {
   const mockBlockToHast =
-    jest.fn<
+    mock.fn<
       (
         client: any,
         opts: { block_id: string }
       ) => Promise<ReturnType<typeof getMockTree>>
     >()
   const reset = () => {
-    mockBlockToHast.mockReset().mockImplementation((_client, { block_id }) => {
+    mockBlockToHast.mock.resetCalls()
+    mockBlockToHast.mock.mockImplementation((_client, { block_id }) => {
       if (block_id === 'reject') {
         return Promise.reject(`${block_id}:blockToHast`)
       }
@@ -77,29 +85,44 @@ jest.unstable_mockModule('notion2hast', () => {
 
   reset()
   return {
+    Client: function () {},
     blockToHast: mockBlockToHast,
     _reset: reset,
     _getMocks: () => ({
       mockBlockToHast
     })
   }
+})()
+mock.module('notion2hast', {
+  exports: mockNotion2HastExports
 })
 
-const mockProps = await import('../../src/lib/props.js')
-const { mockPropsToItemsInstance, mockPropsToItems } = (
-  mockProps as any
-)._getMocks()
+const mockProps = await import('../../src/lib/props.ts')
+const {
+  mockPropsToItemsInstance,
+  mockPropsToItems
+}: {
+  mockPropsToItemsInstance: {
+    toItems: Mock<
+      (props: PageObjectResponse['properties']) => Promise<PropsItem>
+    >
+  }
+  mockPropsToItems: Mock<(typeof mockProps)['PropsToItems']>
+} = (mockProps as any)._getMocks()
 const mockNotion2Hast = await import('notion2hast')
-const { mockBlockToHast } = (mockNotion2Hast as any)._getMocks()
+const {
+  mockBlockToHast
+}: { mockBlockToHast: Mock<(typeof mockNotion2Hast)['blockToHast']> } = (
+  mockNotion2Hast as any
+)._getMocks()
 afterEach(() => {
   ;(mockProps as any)._reset()
   ;(mockNotion2Hast as any)._reset()
 })
 
-const { normalizeOpts, toContent } = await import(
-  '../../src/lib/notion2content.js'
-)
-const notion2content = await import('../../src/lib/notion2content.js')
+const { normalizeOpts, toContent } =
+  await import('../../src/lib/notion2content.ts')
+const notion2content = await import('../../src/lib/notion2content.ts')
 
 type MockClientOpts = {
   mockQueryDatabase: (Partial<Omit<QueryDatabaseResponse, 'results'>> & {
@@ -142,64 +165,70 @@ class MockClient extends Client {
 
 describe('normalizeOpts()', () => {
   it('should return normalized options', () => {
-    expect(
+    assert.deepStrictEqual(
       normalizeOpts({
         query: { database_id: 'test_database' },
         toItemsOpts: {},
         toHastOpts: {}
-      })
-    ).toEqual({
-      target: ['props', 'content'],
-      workersNum: 1,
-      keepOrder: false,
-      skip: 0,
-      limit: -1,
-      query: { database_id: 'test_database' },
-      toItemsOpts: { indexName: '', initialIndex: 1 },
-      toHastOpts: {}
-    })
-    expect(
+      }),
+      {
+        target: ['props', 'content'],
+        workersNum: 1,
+        keepOrder: false,
+        skip: 0,
+        limit: -1,
+        query: { database_id: 'test_database' },
+        toItemsOpts: { indexName: '', initialIndex: 1 },
+        toHastOpts: {}
+      }
+    )
+    assert.deepStrictEqual(
       normalizeOpts({
         query: { database_id: 'test_database', archived: true },
         toItemsOpts: {},
         toHastOpts: { richTexttoHastOpts: {} }
-      })
-    ).toEqual({
-      target: ['props', 'content'],
-      workersNum: 1,
-      keepOrder: false,
-      skip: 0,
-      limit: -1,
-      query: { database_id: 'test_database', archived: true },
-      toItemsOpts: { indexName: '', initialIndex: 1 },
-      toHastOpts: { richTexttoHastOpts: {} }
-    })
-    expect(
+      }),
+      {
+        target: ['props', 'content'],
+        workersNum: 1,
+        keepOrder: false,
+        skip: 0,
+        limit: -1,
+        query: { database_id: 'test_database', archived: true },
+        toItemsOpts: { indexName: '', initialIndex: 1 },
+        toHastOpts: { richTexttoHastOpts: {} }
+      }
+    )
+    assert.deepStrictEqual(
       normalizeOpts({
         query: { database_id: 'test_database', archived: true },
         toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
         toHastOpts: { richTexttoHastOpts: {} }
-      })
-    ).toEqual({
-      target: ['props', 'content'],
-      workersNum: 1,
-      keepOrder: false,
-      skip: 0,
-      limit: -1,
-      query: { database_id: 'test_database', archived: true },
-      toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
-      toHastOpts: { richTexttoHastOpts: {} }
-    })
+      }),
+      {
+        target: ['props', 'content'],
+        workersNum: 1,
+        keepOrder: false,
+        skip: 0,
+        limit: -1,
+        query: { database_id: 'test_database', archived: true },
+        toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
+        toHastOpts: { richTexttoHastOpts: {} }
+      }
+    )
   })
 })
-
 describe('fetchPages()', () => {
-  it('should query database and generate pages(empty)', async () => {
+  it('should query database and generate pages(empty)', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = []
+    const spyQueryDatabases = t.mock.method(
+      MockClient.prototype,
+      'queryDatabases'
+    )
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    //t.mock.property(mockClient, 'queryDatabases', spyQueryDatabases)
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
@@ -209,21 +238,24 @@ describe('fetchPages()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toHaveBeenCalledTimes(1)
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
+    assert.deepStrictEqual(
+      res,
+      mockQueryDatabase.flatMap(({ results }) => results)
+    )
+    assert.strictEqual(spyQueryDatabases.mock.callCount(), 1)
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
       database_id: 'test_database'
     })
   })
 
-  it('should query database and generate pages(skip partial pages)', async () => {
+  it('should query database and generate pages(skip partial pages)', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       { results: [] }
     ]
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
@@ -233,14 +265,17 @@ describe('fetchPages()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toHaveBeenCalledTimes(1)
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
+    assert.deepStrictEqual(
+      res,
+      mockQueryDatabase.flatMap(({ results }) => results)
+    )
+    assert.strictEqual(spyQueryDatabases.mock.callCount(), 1)
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
       database_id: 'test_database'
     })
   })
 
-  it('should query database and generate pages(basic)', async () => {
+  it('should query database and generate pages(basic)', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       {
         results: [
@@ -266,7 +301,7 @@ describe('fetchPages()', () => {
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
@@ -276,14 +311,17 @@ describe('fetchPages()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toHaveBeenCalledTimes(1)
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
+    assert.deepStrictEqual(
+      res,
+      mockQueryDatabase.flatMap(({ results }) => results)
+    )
+    assert.strictEqual(spyQueryDatabases.mock.callCount(), 1)
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
       database_id: 'test_database'
     })
   })
 
-  it('should query database and generate pages(skip)', async () => {
+  it('should query database and generate pages(skip)', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       {
         next_cursor: 'next1',
@@ -351,7 +389,7 @@ describe('fetchPages()', () => {
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
     const g = notion2content.fetchPages(mockClient, {
       skip: 3,
       limit: -1,
@@ -361,24 +399,25 @@ describe('fetchPages()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual(
+    assert.deepStrictEqual(
+      res,
       mockQueryDatabase.flatMap(({ results }) => results).slice(3)
     )
-    expect(spyQueryDatabases).toHaveBeenCalledTimes(3)
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
+    assert.strictEqual(spyQueryDatabases.mock.callCount(), 3)
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
       database_id: 'test_database'
     })
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(2, {
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
       database_id: 'test_database',
       start_cursor: 'next1'
     })
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(3, {
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[2].arguments[0], {
       database_id: 'test_database',
       start_cursor: 'next2'
     })
   })
 
-  it('should query database and generate pages(skip and limit)', async () => {
+  it('should query database and generate pages(skip and limit)', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       {
         next_cursor: 'next1',
@@ -446,7 +485,7 @@ describe('fetchPages()', () => {
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    const spyQueryDatabases = mock.method(mockClient, 'queryDatabases')
     const g = notion2content.fetchPages(mockClient, {
       skip: 3,
       limit: 2,
@@ -456,23 +495,25 @@ describe('fetchPages()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual(
+    assert.deepStrictEqual(
+      res,
       mockQueryDatabase.flatMap(({ results }) => results).slice(3, 5)
     )
-    expect(spyQueryDatabases).toHaveBeenCalledTimes(3)
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
+    assert.strictEqual(spyQueryDatabases.mock.callCount(), 3)
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
       database_id: 'test_database'
     })
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(2, {
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
       database_id: 'test_database',
       start_cursor: 'next1'
     })
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(3, {
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[2].arguments[0], {
       database_id: 'test_database',
       start_cursor: 'next2'
     })
   })
-  it('should query database and generate pages(next cursor)', async () => {
+
+  it('should query database and generate pages(next cursor)', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       {
         next_cursor: 'next1',
@@ -540,7 +581,7 @@ describe('fetchPages()', () => {
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
@@ -550,22 +591,25 @@ describe('fetchPages()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual(mockQueryDatabase.flatMap(({ results }) => results))
-    expect(spyQueryDatabases).toHaveBeenCalledTimes(3)
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
+    assert.deepStrictEqual(
+      res,
+      mockQueryDatabase.flatMap(({ results }) => results)
+    )
+    assert.strictEqual(spyQueryDatabases.mock.callCount(), 3)
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
       database_id: 'test_database'
     })
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(2, {
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
       database_id: 'test_database',
       start_cursor: 'next1'
     })
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(3, {
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[2].arguments[0], {
       database_id: 'test_database',
       start_cursor: 'next2'
     })
   })
 
-  it('should query database and generate pages(limit)', async () => {
+  it('should query database and generate pages(limit)', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       {
         next_cursor: 'next1',
@@ -633,7 +677,7 @@ describe('fetchPages()', () => {
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: 3,
@@ -643,38 +687,42 @@ describe('fetchPages()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual(
+    assert.deepStrictEqual(
+      res,
       mockQueryDatabase.flatMap(({ results }) => results).slice(0, 3)
     )
-    expect(spyQueryDatabases).toHaveBeenCalledTimes(2)
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(1, {
+    assert.strictEqual(spyQueryDatabases.mock.callCount(), 2)
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
       database_id: 'test_database'
     })
-    expect(spyQueryDatabases).toHaveBeenNthCalledWith(2, {
+    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
       database_id: 'test_database',
       start_cursor: 'next1'
     })
   })
 
-  it('should reject from queryDatabase', async () => {
+  it('should reject from queryDatabase', async (t) => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       { reject: true, results: [] }
     ]
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
+    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
       query: { database_id: 'test_database' }
     })
     const res = []
-    expect(async () => {
-      for await (const i of g) {
-        res.push(i)
-      }
-    }).rejects.toThrow('reject: test_database')
+    await assert.rejects(
+      async () => {
+        for await (const i of g) {
+          res.push(i)
+        }
+      },
+      { message: 'reject: test_database' }
+    )
   })
 })
 
@@ -693,10 +741,10 @@ describe('toContent()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual([])
-    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(0)
-    expect(mockBlockToHast).toHaveBeenCalledTimes(0)
+    assert.deepStrictEqual(res, [])
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 0)
   })
 
   it('should generate content(empty properties)', async () => {
@@ -715,16 +763,16 @@ describe('toContent()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual([
+    assert.deepStrictEqual(res, [
       {
         id: 'page1',
         props: { check: '' },
         content: getMockTree('page1')
       }
     ])
-    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(1)
-    expect(mockBlockToHast).toHaveBeenCalledTimes(1)
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 1)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
   })
 
   it('should generate content(basic)', async () => {
@@ -762,7 +810,7 @@ describe('toContent()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual([
+    assert.deepStrictEqual(res, [
       {
         id: 'page1',
         props: { check: 'prop1-1,prop1-2' },
@@ -774,9 +822,9 @@ describe('toContent()', () => {
         content: getMockTree('page2')
       }
     ])
-    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(2)
-    expect(mockBlockToHast).toHaveBeenCalledTimes(2)
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 2)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 2)
   })
 
   it('should generate content(index)', async () => {
@@ -814,7 +862,7 @@ describe('toContent()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual([
+    assert.deepStrictEqual(res, [
       {
         id: 'page1',
         props: { 'test-index': 10, check: 'prop1-1,prop1-2' },
@@ -826,9 +874,9 @@ describe('toContent()', () => {
         content: getMockTree('page2')
       }
     ])
-    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(2)
-    expect(mockBlockToHast).toHaveBeenCalledTimes(2)
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 2)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 2)
   })
 
   it('should generate content(target props)', async () => {
@@ -858,15 +906,15 @@ describe('toContent()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual([
+    assert.deepStrictEqual(res, [
       {
         id: 'page1',
         props: { 'test-index': 10, check: 'prop1-1' }
       }
     ])
-    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(1)
-    expect(mockBlockToHast).toHaveBeenCalledTimes(0)
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 1)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 0)
   })
 
   it('should generate content(target contrent)', async () => {
@@ -896,15 +944,15 @@ describe('toContent()', () => {
     for await (const i of g) {
       res.push(i)
     }
-    expect(res).toEqual([
+    assert.deepStrictEqual(res, [
       {
         id: 'page1',
         content: getMockTree('page1')
       }
     ])
-    expect(mockPropsToItems).toHaveBeenCalledTimes(1)
-    expect(mockPropsToItemsInstance.toItems).toHaveBeenCalledTimes(0)
-    expect(mockBlockToHast).toHaveBeenCalledTimes(1)
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
   })
 
   it('should reject from queryDatabase', async () => {
@@ -914,19 +962,22 @@ describe('toContent()', () => {
     const mockClient = new MockClient({
       mockQueryDatabase
     })
-    const spyQueryDatabases = jest.spyOn(mockClient, 'queryDatabases')
     const g = toContent(mockClient, {
       query: { database_id: 'test_database' },
       toItemsOpts: {},
       toHastOpts: {}
     })
     const res = []
-    expect(async () => {
-      for await (const i of g) {
-        res.push(i)
+    await assert.rejects(
+      async () => {
+        for await (const i of g) {
+          res.push(i)
+        }
+      },
+      {
+        message:
+          'toContent: error from fetchPages: Error: reject: test_database, database_id:test_database'
       }
-    }).rejects.toThrow(
-      'toContent: error from fetchPages: Error: reject: test_database, database_id:test_database'
     )
   })
 
@@ -953,15 +1004,18 @@ describe('toContent()', () => {
       toHastOpts: {}
     })
     const res = []
-    expect(async () => {
-      for await (const i of g) {
-        res.push(i)
+    await assert.rejects(
+      async () => {
+        for await (const i of g) {
+          res.push(i)
+        }
+      },
+      {
+        message:
+          'toContent: error from propsToItems.toItems: reject:toItems, database_id:test_database, page_id:page1'
       }
-    }).rejects.toThrow(
-      'toContent: error from propsToItems.toItems: reject:toItems, database_id:test_database, page_id:page1'
     )
   })
-
   it('should reject from blockToHast', async () => {
     const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
       {
@@ -985,12 +1039,16 @@ describe('toContent()', () => {
       toHastOpts: {}
     })
     const res = []
-    expect(async () => {
-      for await (const i of g) {
-        res.push(i)
+    await assert.rejects(
+      async () => {
+        for await (const i of g) {
+          res.push(i)
+        }
+      },
+      {
+        message:
+          'toContent: error from blockToHast: reject:blockToHast, database_id:test_database, page_id:reject'
       }
-    }).rejects.toThrow(
-      'toContent: error from blockToHast: reject:blockToHast, database_id:test_database, page_id:reject'
     )
   })
 })
