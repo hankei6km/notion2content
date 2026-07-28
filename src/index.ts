@@ -1,6 +1,6 @@
 export { Client } from './lib/client.js'
 export { toContent } from './lib/notion2content.js'
-export { Format } from './format.js'
+export { Format } from './format/index.js'
 export type {
   OutputTarget,
   ToContentOpts,

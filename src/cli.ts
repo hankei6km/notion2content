@@ -5,7 +5,7 @@ import { Client as NotionClient } from '@notionhq/client'
 import { ClientOptions } from '@notionhq/client/build/src/Client'
 import { Client } from './lib/client.js'
 import { toContent } from './lib/notion2content.js'
-import { Format } from './format.js'
+import { Format } from './format/index.js'
 import { ContentRaw, ToContentOpts } from './lib/types.js'
 
 class CliClient extends Client {

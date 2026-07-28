@@ -1,4 +1,5 @@
-import { normalizeFormatOptions, Format } from '../../src/format'
+import { Format } from '../../src/format/index.js'
+import { normalizeFormatOptions } from '../../src/format/internal.js'
 
 describe('normalizeFormatOptions()', () => {
   it('should return normalized options', async () => {
