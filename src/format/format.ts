@@ -3,8 +3,8 @@ import { toHtml as hastToHtml } from 'hast-util-to-html'
 import { toMdast as hastToMdast } from 'hast-util-to-mdast'
 import { toMarkdown as mdastToMarkdown } from 'mdast-util-to-markdown'
 import { gfmToMarkdown } from 'mdast-util-gfm'
-import { ContentRaw } from '../lib/types'
-import { normalizeFormatOptions } from './internal.js'
+import type { ContentRaw } from '../lib/types.ts'
+import { normalizeFormatOptions } from './internal.ts'
 
 export type FormatOptions = {}
 export async function toFrontmatterString(

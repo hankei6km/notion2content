@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
-import { cli } from './cli.js'
+import { cli } from './cli.ts'
 
 const envVarsPrefix =
   process.env['NOTION2CONTENT_ENV_VARS_PREFIX'] || 'NOTION2CONTENT'

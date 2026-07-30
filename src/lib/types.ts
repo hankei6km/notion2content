@@ -1,6 +1,8 @@
 import type { toMdast } from 'hast-util-to-mdast'
-import { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints'
-import { ToHastOpts } from 'notion2hast/dist/lib/types'
+import type { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints.d.ts'
+//import { ToHastOpts } from 'notion2hast/dist/lib/types'
+import type { blockToHast } from 'notion2hast'
+type ToHastOpts = Parameters<typeof blockToHast>[1]
 
 type Nodes = Parameters<typeof toMdast>[0]
 

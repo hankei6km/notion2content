@@ -1,11 +1,11 @@
-import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints'
+import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints.d.ts'
 import type {
   PartialUserObjectResponse,
   UserObjectResponse,
   PersonUserObjectResponse,
   GroupObjectResponse
-} from '@notionhq/client/build/src/api-endpoints'
-import { PropsItem, PropsItemValue } from './types'
+} from '@notionhq/client/build/src/api-endpoints.d.ts'
+import type { PropsItem, PropsItemValue } from './types.ts'
 
 function isPersonUserObjectResponse(v: any): v is PersonUserObjectResponse {
   return v.object === 'user' && v.type === 'person'

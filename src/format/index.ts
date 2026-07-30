@@ -1,1 +1,1 @@
-export * as Format from './format.js'
+export * as Format from './format.ts'
