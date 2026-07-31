@@ -27,7 +27,7 @@ npm install --save notion2content
 
 ```
 $ export NOTION2CONTENT_API_KEY=<NOTION API KEY>
-$ notion2content dist/main.js --database-id <DATABASE ID>
+$ notion2content dist/main.js --data-source-id <DATA SOURCE ID>
 {"id":"*****","props":{ ... },"content":{"type":"root","children":[ ... ]}}
 {"id":"*****","props":{ ... },"content":{"type":"root","children":[ ... ]}}
 {"id":"*****","props":{ ... },"content":{"type":"root","children":[ ... ]}}
@@ -36,7 +36,7 @@ $ notion2content dist/main.js --database-id <DATABASE ID>
 ページ別にファイルへ保存。HTML と Markdown の場合は Propery が Frontmatter となる。
 
 ```
-$ notion2content dist/main.js --database-id <DATABASE ID> --save-dir ./tmp --save-format md
+$ notion2content dist/main.js --data-source-id <DATA SOURCE ID> --save-dir ./tmp --save-format md
 $ ll tmp
 total 20
 drwxrwxrwx+  2 vscode vscode 4096 Sep 30 16:15 ./
@@ -63,10 +63,10 @@ class CliClient extends Client {
     super()
     this.client = new NotionClient(options)
   }
-  queryDatabases(
-    ...args: Parameters<NotionClient['databases']['query']>
-  ): ReturnType<NotionClient['databases']['query']> {
-    return this.client.databases.query(...args)
+  queryDataSources(
+    ...args: Parameters<NotionClient['dataSources']['query']>
+  ): ReturnType<NotionClient['dataSources']['query']> {
+    return this.client.dataSources.query(...args)
   }
   listBlockChildren(
     ...args: Parameters<NotionClient['blocks']['children']['list']>
@@ -89,7 +89,7 @@ const client = new CliClient({
 })
 const ite = toContent(client, {
   target: ['props', 'content'],
-  query: { database_id: '*****' },
+  query: { data_source_id: '*****' },
   toItemsOpts: {},
   toHastOpts: {}
 })
@@ -110,7 +110,7 @@ for await (const content of ite) {
 
 ##### `inOpts.query`
 
-Notion Clinet の `databases.query` へ渡す引数。
+Notion Client の `dataSources.query` へ渡す引数。
 
 ##### `inOpts.skip`
 

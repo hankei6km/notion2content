@@ -14,10 +14,10 @@ describe('Class()', () => {
         super()
         this.client = new NotionClient(options)
       }
-      queryDatabases(
-        ...args: Parameters<NotionClient['databases']['query']>
-      ): ReturnType<NotionClient['databases']['query']> {
-        return this.client.databases.query(...args)
+      queryDataSources(
+        ...args: Parameters<NotionClient['dataSources']['query']>
+      ): ReturnType<NotionClient['dataSources']['query']> {
+        return this.client.dataSources.query(...args)
       }
       listBlockChildren(
         ...args: Parameters<NotionClient['blocks']['children']['list']>
@@ -28,21 +28,21 @@ describe('Class()', () => {
     const client = new CliClient()
     assert.ok(client instanceof Client)
     assert.strictEqual(typeof client.listBlockChildren, 'function')
-    assert.strictEqual(typeof client.queryDatabases, 'function')
+    assert.strictEqual(typeof client.queryDataSources, 'function')
   })
 })
 
 describe('toContent()', () => {
   it('should use a Client instance in toContent()', async (t) => {
     class MockClient extends Client {
-      public queryDatabasesMock = t.mock.fn()
+      public queryDataSourcesMock = t.mock.fn()
       constructor() {
         super()
       }
-      queryDatabases(
-        ...args: Parameters<NotionClient['databases']['query']>
-      ): ReturnType<NotionClient['databases']['query']> {
-        this.queryDatabasesMock(...args)
+      queryDataSources(
+        ...args: Parameters<NotionClient['dataSources']['query']>
+      ): ReturnType<NotionClient['dataSources']['query']> {
+        this.queryDataSourcesMock(...args)
         return {} as any
       }
       listBlockChildren(
@@ -53,7 +53,7 @@ describe('toContent()', () => {
     }
     const client = new MockClient()
     const ite = toContent(client, {
-      query: { database_id: 'test' },
+      query: { data_source_id: 'test' },
       toItemsOpts: {
         indexName: '',
         initialIndex: 1
@@ -63,9 +63,9 @@ describe('toContent()', () => {
     const res = await ite.next()
     assert.deepStrictEqual(res, { done: true, value: undefined })
     assert.deepStrictEqual(
-      client.queryDatabasesMock.mock.calls[0].arguments[0],
+      client.queryDataSourcesMock.mock.calls[0].arguments[0],
       {
-        database_id: 'test'
+        data_source_id: 'test'
         // start_cursor: undefined // 最初の呼び出しでは start_cursor は定義されていない
       }
     )

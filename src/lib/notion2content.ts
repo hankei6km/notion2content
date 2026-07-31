@@ -16,7 +16,7 @@ const defaultOpts: Required<ToContentOpts> = {
   keepOrder: false,
   skip: 0,
   limit: -1,
-  query: { database_id: '' },
+  query: { data_source_id: '' },
   toItemsOpts: { indexName: '', initialIndex: 1 },
   toHastOpts: {}
 }
@@ -67,7 +67,7 @@ export async function* fetchPages(
 
   // TODO: limit にあわせて page_size を調整
   const opts = Object.assign({}, query) // start_cursor を書き換えるため
-  let pages = await client.queryDatabases(opts)
+  let pages = await client.queryDataSources(opts)
   let resultsItems = pages.results
   while (resultsItems && resultsItems.length > 0 && !reachedLimit) {
     for (const pageTmp of resultsItems) {
@@ -89,7 +89,7 @@ export async function* fetchPages(
     if (pages.next_cursor && !reachedLimit) {
       const opts = Object.assign({}, query) // spyOn 対策(履歴は shallow copy)
       opts.start_cursor = pages.next_cursor
-      pages = await client.queryDatabases(opts)
+      pages = await client.queryDataSources(opts)
       resultsItems = pages.results
     }
   }
@@ -119,7 +119,7 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
           if (outProps) {
             q.props = await propsToItems.toItems(page.properties).catch((e) => {
               err = new Error(
-                `toContent: error from propsToItems.toItems: ${e}, database_id:${opts.query.database_id}, page_id:${page.id}`
+                `toContent: error from propsToItems.toItems: ${e}, data_source_id:${opts.query.data_source_id}, page_id:${page.id}`
               )
               return undefined
             })
@@ -133,15 +133,15 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
               ...opts.toHastOpts
             }).catch((e) => {
               err = new Error(
-                `toContent: error from blockToHast: ${e}, database_id:${opts.query.database_id}, page_id:${page.id}`
+                `toContent: error from blockToHast: ${e}, data_source_id:${opts.query.data_source_id}, page_id:${page.id}`
               )
               return undefined
             })
             if (err === null) {
               if (!isNodes(content)) {
                 err = new Error(
-                  `toContent: error type of content is not Nodes, database_id:${
-                    opts.query.database_id
+                  `toContent: error type of content is not Nodes, data_source_id:${
+                    opts.query.data_source_id
                   }, page_id:${page.id}, content:${JSON.stringify(
                     content,
                     null,
@@ -160,7 +160,7 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
       }
     } catch (e: any) {
       err = new Error(
-        `toContent: error from fetchPages: ${e}, database_id:${opts.query.database_id}`
+        `toContent: error from fetchPages: ${e}, data_source_id:${opts.query.data_source_id}`
       )
     }
 

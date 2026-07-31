@@ -1,5 +1,5 @@
 import type { toMdast } from 'hast-util-to-mdast'
-import type { QueryDatabaseParameters } from '@notionhq/client/build/src/api-endpoints.d.ts'
+import type { QueryDataSourceParameters } from '@notionhq/client/build/src/api-endpoints.d.ts'
 //import { ToHastOpts } from 'notion2hast/dist/lib/types'
 import type { blockToHast } from 'notion2hast'
 type ToHastOpts = Parameters<typeof blockToHast>[1]
@@ -14,7 +14,7 @@ export type ToContentOpts = {
   keepOrder?: boolean
   skip?: number
   limit?: number
-  query: QueryDatabaseParameters
+  query: QueryDataSourceParameters
   toItemsOpts: { indexName?: string; initialIndex?: number }
   toHastOpts: Omit<ToHastOpts, 'block_id' | 'parent'>
 }
