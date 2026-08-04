@@ -26,7 +26,7 @@
     "start:ts": "node --experimental-strip-types src/main.ts",
     "prebuild": "npm run clean",
     "build": "tsc -p tsconfig.build.json",
-    "test": "node --experimental-test-module-mocks --experimental-test-module-mocks --experimental-strip-types --test",
+    "test": "node --experimental-test-module-mocks --experimental-strip-types --test",
     "test:coverage": "npm run test -- --experimental-test-coverage",
     "lint:types": "tsc --noEmit -p tsconfig.json",
     "clean": "rm -rf dist/*"
