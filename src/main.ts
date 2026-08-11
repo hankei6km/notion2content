@@ -19,11 +19,11 @@ const envVarsPrefix =
         required: true,
         description: 'API Key to API endpoint'
       },
-      'database-id': {
+      'data-source-id': {
         type: 'string',
         array: false,
         required: true,
-        description: 'The id of database in Notion'
+        description: 'The id of data source in Notion'
       },
       'workers-num': {
         type: 'number',
@@ -98,7 +98,7 @@ const envVarsPrefix =
   process.exit(
     await cli({
       apiKey: argv['api-key'],
-      databaseId: argv['database-id'],
+      dataSourceId: argv['data-source-id'],
       defaultClassName: argv['default-class-name'],
       workersNum: argv['workers-num'],
       limit: argv['limit'],

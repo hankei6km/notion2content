@@ -142,7 +142,7 @@ describe('cli()', () => {
     assert.strictEqual(
       await cli({
         apiKey: 'test-api-key-1',
-        databaseId: 'test-database-id-1',
+        dataSourceId: 'test-data-source-id-1',
         workersNum: 1,
         stdout,
         stderr
@@ -161,7 +161,7 @@ describe('cli()', () => {
         skip: undefined,
         limit: undefined,
         query: {
-          database_id: 'test-database-id-1'
+          data_source_id: 'test-data-source-id-1'
         },
         workersNum: 1,
         toItemsOpts: {
@@ -193,7 +193,7 @@ describe('cli()', () => {
     assert.strictEqual(
       await cli({
         apiKey: 'test-api-key-1',
-        databaseId: 'test-database-id-1',
+        dataSourceId: 'test-data-source-id-1',
         workersNum: 1,
         saveDir: 'tmp',
         saveFormat: 'html',
@@ -214,7 +214,7 @@ describe('cli()', () => {
         skip: undefined,
         limit: undefined,
         query: {
-          database_id: 'test-database-id-1'
+          data_source_id: 'test-data-source-id-1'
         },
         workersNum: 1,
         toItemsOpts: {

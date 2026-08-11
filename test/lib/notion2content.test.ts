@@ -6,7 +6,7 @@ import { Client } from '../../src/lib/client.ts'
 import { Client as NotionClient } from '@notionhq/client'
 import type {
   PageObjectResponse,
-  QueryDatabaseResponse
+  QueryDataSourceResponse
 } from '@notionhq/client/build/src/api-endpoints.d.ts'
 import type { PropsItem } from '../../src/lib/types.ts'
 
@@ -125,32 +125,32 @@ const { normalizeOpts, toContent } =
 const notion2content = await import('../../src/lib/notion2content.ts')
 
 type MockClientOpts = {
-  mockQueryDatabase: (Partial<Omit<QueryDatabaseResponse, 'results'>> & {
-    results: Partial<QueryDatabaseResponse['results'][0]>[]
+  mockQueryDataSources: (Partial<Omit<QueryDataSourceResponse, 'results'>> & {
+    results: Partial<QueryDataSourceResponse['results'][0]>[]
   } & { reject?: boolean })[]
 }
 class MockClient extends Client {
-  iteQueryDatabase: Generator<
-    MockClientOpts['mockQueryDatabase'][0],
+  iteQueryDataSources: Generator<
+    MockClientOpts['mockQueryDataSources'][0],
     void,
     unknown
   >
   //iteListBlockChildren: Generator<any, void, unknown>
   constructor(mock: MockClientOpts) {
     super()
-    this.iteQueryDatabase = (function* () {
-      for (const i of mock.mockQueryDatabase) {
+    this.iteQueryDataSources = (function* () {
+      for (const i of mock.mockQueryDataSources) {
         yield i as any
       }
     })()
   }
-  queryDatabases(
-    ...args: Parameters<NotionClient['databases']['query']>
-  ): ReturnType<NotionClient['databases']['query']> {
-    const mock = this.iteQueryDatabase.next()
+  queryDataSources(
+    ...args: Parameters<NotionClient['dataSources']['query']>
+  ): ReturnType<NotionClient['dataSources']['query']> {
+    const mock = this.iteQueryDataSources.next()
     if (!mock.done) {
       if (mock.value.reject) {
-        throw new Error(`reject: ${args[0].database_id}`)
+        throw new Error(`reject: ${args[0].data_source_id}`)
       }
       return mock.value as any
     }
@@ -167,7 +167,7 @@ describe('normalizeOpts()', () => {
   it('should return normalized options', () => {
     assert.deepStrictEqual(
       normalizeOpts({
-        query: { database_id: 'test_database' },
+        query: { data_source_id: 'test_data_source' },
         toItemsOpts: {},
         toHastOpts: {}
       }),
@@ -177,14 +177,14 @@ describe('normalizeOpts()', () => {
         keepOrder: false,
         skip: 0,
         limit: -1,
-        query: { database_id: 'test_database' },
+        query: { data_source_id: 'test_data_source' },
         toItemsOpts: { indexName: '', initialIndex: 1 },
         toHastOpts: {}
       }
     )
     assert.deepStrictEqual(
       normalizeOpts({
-        query: { database_id: 'test_database', archived: true },
+        query: { data_source_id: 'test_data_source', archived: true },
         toItemsOpts: {},
         toHastOpts: { richTexttoHastOpts: {} }
       }),
@@ -194,14 +194,14 @@ describe('normalizeOpts()', () => {
         keepOrder: false,
         skip: 0,
         limit: -1,
-        query: { database_id: 'test_database', archived: true },
+        query: { data_source_id: 'test_data_source', archived: true },
         toItemsOpts: { indexName: '', initialIndex: 1 },
         toHastOpts: { richTexttoHastOpts: {} }
       }
     )
     assert.deepStrictEqual(
       normalizeOpts({
-        query: { database_id: 'test_database', archived: true },
+        query: { data_source_id: 'test_data_source', archived: true },
         toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
         toHastOpts: { richTexttoHastOpts: {} }
       }),
@@ -211,7 +211,7 @@ describe('normalizeOpts()', () => {
         keepOrder: false,
         skip: 0,
         limit: -1,
-        query: { database_id: 'test_database', archived: true },
+        query: { data_source_id: 'test_data_source', archived: true },
         toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
         toHastOpts: { richTexttoHastOpts: {} }
       }
@@ -219,20 +219,20 @@ describe('normalizeOpts()', () => {
   })
 })
 describe('fetchPages()', () => {
-  it('should query database and generate pages(empty)', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = []
-    const spyQueryDatabases = t.mock.method(
+  it('should query data source and generate pages(empty)', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = []
+    const spyQueryDataSources = t.mock.method(
       MockClient.prototype,
-      'queryDatabases'
+      'queryDataSources'
     )
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    //t.mock.property(mockClient, 'queryDatabases', spyQueryDatabases)
+    //t.mock.property(mockClient, 'queryDataSources', spyQueryDataSources)
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     for await (const i of g) {
@@ -240,26 +240,26 @@ describe('fetchPages()', () => {
     }
     assert.deepStrictEqual(
       res,
-      mockQueryDatabase.flatMap(({ results }) => results)
+      mockQueryDataSources.flatMap(({ results }) => results)
     )
-    assert.strictEqual(spyQueryDatabases.mock.callCount(), 1)
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
-      database_id: 'test_database'
+    assert.strictEqual(spyQueryDataSources.mock.callCount(), 1)
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[0].arguments[0], {
+      data_source_id: 'test_data_source'
     })
   })
 
-  it('should query database and generate pages(skip partial pages)', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should query data source and generate pages(skip partial pages)', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       { results: [] }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
+    const spyQueryDataSources = t.mock.method(mockClient, 'queryDataSources')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     for await (const i of g) {
@@ -267,16 +267,16 @@ describe('fetchPages()', () => {
     }
     assert.deepStrictEqual(
       res,
-      mockQueryDatabase.flatMap(({ results }) => results)
+      mockQueryDataSources.flatMap(({ results }) => results)
     )
-    assert.strictEqual(spyQueryDatabases.mock.callCount(), 1)
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
-      database_id: 'test_database'
+    assert.strictEqual(spyQueryDataSources.mock.callCount(), 1)
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[0].arguments[0], {
+      data_source_id: 'test_data_source'
     })
   })
 
-  it('should query database and generate pages(basic)', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should query data source and generate pages(basic)', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
           {
@@ -299,13 +299,13 @@ describe('fetchPages()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
+    const spyQueryDataSources = t.mock.method(mockClient, 'queryDataSources')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     for await (const i of g) {
@@ -313,16 +313,16 @@ describe('fetchPages()', () => {
     }
     assert.deepStrictEqual(
       res,
-      mockQueryDatabase.flatMap(({ results }) => results)
+      mockQueryDataSources.flatMap(({ results }) => results)
     )
-    assert.strictEqual(spyQueryDatabases.mock.callCount(), 1)
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
-      database_id: 'test_database'
+    assert.strictEqual(spyQueryDataSources.mock.callCount(), 1)
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[0].arguments[0], {
+      data_source_id: 'test_data_source'
     })
   })
 
-  it('should query database and generate pages(skip)', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should query data source and generate pages(skip)', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         next_cursor: 'next1',
         results: [
@@ -387,13 +387,13 @@ describe('fetchPages()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
+    const spyQueryDataSources = t.mock.method(mockClient, 'queryDataSources')
     const g = notion2content.fetchPages(mockClient, {
       skip: 3,
       limit: -1,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     for await (const i of g) {
@@ -401,24 +401,24 @@ describe('fetchPages()', () => {
     }
     assert.deepStrictEqual(
       res,
-      mockQueryDatabase.flatMap(({ results }) => results).slice(3)
+      mockQueryDataSources.flatMap(({ results }) => results).slice(3)
     )
-    assert.strictEqual(spyQueryDatabases.mock.callCount(), 3)
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
-      database_id: 'test_database'
+    assert.strictEqual(spyQueryDataSources.mock.callCount(), 3)
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[0].arguments[0], {
+      data_source_id: 'test_data_source'
     })
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
-      database_id: 'test_database',
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[1].arguments[0], {
+      data_source_id: 'test_data_source',
       start_cursor: 'next1'
     })
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[2].arguments[0], {
-      database_id: 'test_database',
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[2].arguments[0], {
+      data_source_id: 'test_data_source',
       start_cursor: 'next2'
     })
   })
 
-  it('should query database and generate pages(skip and limit)', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should query data source and generate pages(skip and limit)', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         next_cursor: 'next1',
         results: [
@@ -483,13 +483,13 @@ describe('fetchPages()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    const spyQueryDatabases = mock.method(mockClient, 'queryDatabases')
+    const spyQueryDataSources = t.mock.method(mockClient, 'queryDataSources')
     const g = notion2content.fetchPages(mockClient, {
       skip: 3,
       limit: 2,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     for await (const i of g) {
@@ -497,24 +497,24 @@ describe('fetchPages()', () => {
     }
     assert.deepStrictEqual(
       res,
-      mockQueryDatabase.flatMap(({ results }) => results).slice(3, 5)
+      mockQueryDataSources.flatMap(({ results }) => results).slice(3, 5)
     )
-    assert.strictEqual(spyQueryDatabases.mock.callCount(), 3)
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
-      database_id: 'test_database'
+    assert.strictEqual(spyQueryDataSources.mock.callCount(), 3)
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[0].arguments[0], {
+      data_source_id: 'test_data_source'
     })
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
-      database_id: 'test_database',
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[1].arguments[0], {
+      data_source_id: 'test_data_source',
       start_cursor: 'next1'
     })
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[2].arguments[0], {
-      database_id: 'test_database',
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[2].arguments[0], {
+      data_source_id: 'test_data_source',
       start_cursor: 'next2'
     })
   })
 
-  it('should query database and generate pages(next cursor)', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should query data source and generate pages(next cursor)', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         next_cursor: 'next1',
         results: [
@@ -579,13 +579,13 @@ describe('fetchPages()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
+    const spyQueryDataSources = t.mock.method(mockClient, 'queryDataSources')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     for await (const i of g) {
@@ -593,24 +593,24 @@ describe('fetchPages()', () => {
     }
     assert.deepStrictEqual(
       res,
-      mockQueryDatabase.flatMap(({ results }) => results)
+      mockQueryDataSources.flatMap(({ results }) => results)
     )
-    assert.strictEqual(spyQueryDatabases.mock.callCount(), 3)
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
-      database_id: 'test_database'
+    assert.strictEqual(spyQueryDataSources.mock.callCount(), 3)
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[0].arguments[0], {
+      data_source_id: 'test_data_source'
     })
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
-      database_id: 'test_database',
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[1].arguments[0], {
+      data_source_id: 'test_data_source',
       start_cursor: 'next1'
     })
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[2].arguments[0], {
-      database_id: 'test_database',
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[2].arguments[0], {
+      data_source_id: 'test_data_source',
       start_cursor: 'next2'
     })
   })
 
-  it('should query database and generate pages(limit)', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should query data source and generate pages(limit)', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         next_cursor: 'next1',
         results: [
@@ -675,13 +675,13 @@ describe('fetchPages()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
+    const spyQueryDataSources = t.mock.method(mockClient, 'queryDataSources')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: 3,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     for await (const i of g) {
@@ -689,30 +689,30 @@ describe('fetchPages()', () => {
     }
     assert.deepStrictEqual(
       res,
-      mockQueryDatabase.flatMap(({ results }) => results).slice(0, 3)
+      mockQueryDataSources.flatMap(({ results }) => results).slice(0, 3)
     )
-    assert.strictEqual(spyQueryDatabases.mock.callCount(), 2)
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[0].arguments[0], {
-      database_id: 'test_database'
+    assert.strictEqual(spyQueryDataSources.mock.callCount(), 2)
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[0].arguments[0], {
+      data_source_id: 'test_data_source'
     })
-    assert.deepStrictEqual(spyQueryDatabases.mock.calls[1].arguments[0], {
-      database_id: 'test_database',
+    assert.deepStrictEqual(spyQueryDataSources.mock.calls[1].arguments[0], {
+      data_source_id: 'test_data_source',
       start_cursor: 'next1'
     })
   })
 
-  it('should reject from queryDatabase', async (t) => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should reject from queryDataSources', async (t) => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       { reject: true, results: [] }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
-    const spyQueryDatabases = t.mock.method(mockClient, 'queryDatabases')
+    const spyQueryDataSources = t.mock.method(mockClient, 'queryDataSources')
     const g = notion2content.fetchPages(mockClient, {
       skip: 0,
       limit: -1,
-      query: { database_id: 'test_database' }
+      query: { data_source_id: 'test_data_source' }
     })
     const res = []
     await assert.rejects(
@@ -721,19 +721,19 @@ describe('fetchPages()', () => {
           res.push(i)
         }
       },
-      { message: 'reject: test_database' }
+      { message: 'reject: test_data_source' }
     )
   })
 })
 
 describe('toContent()', () => {
   it('should generate content(empty)', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = []
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = []
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: {},
       toHastOpts: {}
     })
@@ -748,14 +748,14 @@ describe('toContent()', () => {
   })
 
   it('should generate content(empty properties)', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       { results: [{ archived: false, properties: {}, id: 'page1' }] }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: {},
       toHastOpts: {}
     })
@@ -776,7 +776,7 @@ describe('toContent()', () => {
   })
 
   it('should generate content(basic)', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
           {
@@ -799,10 +799,10 @@ describe('toContent()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: {},
       toHastOpts: {}
     })
@@ -828,7 +828,7 @@ describe('toContent()', () => {
   })
 
   it('should generate content(index)', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
           {
@@ -851,10 +851,10 @@ describe('toContent()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
       toHastOpts: {}
     })
@@ -880,7 +880,7 @@ describe('toContent()', () => {
   })
 
   it('should generate content(target props)', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
           {
@@ -894,11 +894,11 @@ describe('toContent()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
       target: ['props'],
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
       toHastOpts: {}
     })
@@ -918,7 +918,7 @@ describe('toContent()', () => {
   })
 
   it('should generate content(target contrent)', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
           {
@@ -932,11 +932,11 @@ describe('toContent()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
       target: ['content'],
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
       toHastOpts: {}
     })
@@ -955,15 +955,15 @@ describe('toContent()', () => {
     assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
   })
 
-  it('should reject from queryDatabase', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+  it('should reject from queryDataSources', async () => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       { reject: true, results: [] }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: {},
       toHastOpts: {}
     })
@@ -976,13 +976,13 @@ describe('toContent()', () => {
       },
       {
         message:
-          'toContent: error from fetchPages: Error: reject: test_database, database_id:test_database'
+          'toContent: error from fetchPages: Error: reject: test_data_source, data_source_id:test_data_source'
       }
     )
   })
 
   it('should reject from toItems', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
           {
@@ -996,10 +996,10 @@ describe('toContent()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: {},
       toHastOpts: {}
     })
@@ -1012,12 +1012,12 @@ describe('toContent()', () => {
       },
       {
         message:
-          'toContent: error from propsToItems.toItems: reject:toItems, database_id:test_database, page_id:page1'
+          'toContent: error from propsToItems.toItems: reject:toItems, data_source_id:test_data_source, page_id:page1'
       }
     )
   })
   it('should reject from blockToHast', async () => {
-    const mockQueryDatabase: MockClientOpts['mockQueryDatabase'] = [
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
           {
@@ -1031,10 +1031,10 @@ describe('toContent()', () => {
       }
     ]
     const mockClient = new MockClient({
-      mockQueryDatabase
+      mockQueryDataSources
     })
     const g = toContent(mockClient, {
-      query: { database_id: 'test_database' },
+      query: { data_source_id: 'test_data_source' },
       toItemsOpts: {},
       toHastOpts: {}
     })
@@ -1047,7 +1047,7 @@ describe('toContent()', () => {
       },
       {
         message:
-          'toContent: error from blockToHast: reject:blockToHast, database_id:test_database, page_id:reject'
+          'toContent: error from blockToHast: reject:blockToHast, data_source_id:test_data_source, page_id:reject'
       }
     )
   })

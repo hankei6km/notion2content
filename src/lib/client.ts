@@ -6,8 +6,8 @@ export type ClientOptions = {
 }
 
 export abstract class Client extends N2hClient {
-  abstract queryDatabases(
+  abstract queryDataSources(
     // args: WithAuth<QueryDatabaseParameters>
-    ...args: Parameters<NotionClient['databases']['query']>
-  ): ReturnType<NotionClient['databases']['query']>
+    ...args: Parameters<NotionClient['dataSources']['query']>
+  ): ReturnType<NotionClient['dataSources']['query']>
 }

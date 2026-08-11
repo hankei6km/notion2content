@@ -14,10 +14,10 @@ class CliClient extends Client {
     super()
     this.client = new NotionClient(options)
   }
-  queryDatabases(
-    ...args: Parameters<NotionClient['databases']['query']>
-  ): ReturnType<NotionClient['databases']['query']> {
-    return this.client.databases.query(...args)
+  queryDataSources(
+    ...args: Parameters<NotionClient['dataSources']['query']>
+  ): ReturnType<NotionClient['dataSources']['query']> {
+    return this.client.dataSources.query(...args)
   }
   listBlockChildren(
     ...args: Parameters<NotionClient['blocks']['children']['list']>
@@ -28,7 +28,7 @@ class CliClient extends Client {
 
 type Opts = {
   apiKey: string
-  databaseId: string
+  dataSourceId: string
   workersNum?: number
   skip?: number
   limit?: number
@@ -73,7 +73,7 @@ export function targetArray(
 
 export const cli = async ({
   apiKey,
-  databaseId,
+  dataSourceId,
   workersNum,
   skip,
   limit,
@@ -96,7 +96,7 @@ export const cli = async ({
       workersNum,
       skip,
       limit,
-      query: { database_id: databaseId },
+      query: { data_source_id: dataSourceId },
       toItemsOpts: { indexName, initialIndex },
       toHastOpts: {
         blocktoHastOpts: { defaultClassName },
