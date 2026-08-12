@@ -71,18 +71,16 @@ export async function* fetchPages(
   let resultsItems = pages.results
   while (resultsItems && resultsItems.length > 0 && !reachedLimit) {
     for (const pageTmp of resultsItems) {
-      if (typeof (pageTmp as any).archived === 'boolean') {
-        const page: PageObjectResponse = pageTmp as any
-        if (skipCount <= 0) {
-          yield page
-          limitCount++
-          if (checkLimit(limitCount)) {
-            reachedLimit = true
-            break
-          }
-        } else {
-          skipCount--
+      const page: PageObjectResponse = pageTmp as any
+      if (skipCount <= 0) {
+        yield page
+        limitCount++
+        if (checkLimit(limitCount)) {
+          reachedLimit = true
+          break
         }
+      } else {
+        skipCount--
       }
     }
     resultsItems = []
