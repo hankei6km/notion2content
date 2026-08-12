@@ -184,7 +184,7 @@ describe('normalizeOpts()', () => {
     )
     assert.deepStrictEqual(
       normalizeOpts({
-        query: { data_source_id: 'test_data_source', archived: true },
+        query: { data_source_id: 'test_data_source' },
         toItemsOpts: {},
         toHastOpts: { richTexttoHastOpts: {} }
       }),
@@ -194,14 +194,14 @@ describe('normalizeOpts()', () => {
         keepOrder: false,
         skip: 0,
         limit: -1,
-        query: { data_source_id: 'test_data_source', archived: true },
+        query: { data_source_id: 'test_data_source' },
         toItemsOpts: { indexName: '', initialIndex: 1 },
         toHastOpts: { richTexttoHastOpts: {} }
       }
     )
     assert.deepStrictEqual(
       normalizeOpts({
-        query: { data_source_id: 'test_data_source', archived: true },
+        query: { data_source_id: 'test_data_source' },
         toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
         toHastOpts: { richTexttoHastOpts: {} }
       }),
@@ -211,7 +211,7 @@ describe('normalizeOpts()', () => {
         keepOrder: false,
         skip: 0,
         limit: -1,
-        query: { data_source_id: 'test_data_source', archived: true },
+        query: { data_source_id: 'test_data_source' },
         toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
         toHastOpts: { richTexttoHastOpts: {} }
       }
@@ -280,7 +280,6 @@ describe('fetchPages()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -288,7 +287,6 @@ describe('fetchPages()', () => {
             id: 'page1'
           },
           {
-            archived: false,
             properties: {
               'prop2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -327,7 +325,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next1',
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -335,7 +332,6 @@ describe('fetchPages()', () => {
             id: 'page1-1'
           },
           {
-            archived: false,
             properties: {
               'prop1-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -348,7 +344,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next2',
         results: [
           {
-            archived: false,
             properties: {
               'prop2-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -356,7 +351,6 @@ describe('fetchPages()', () => {
             id: 'page2-1'
           },
           {
-            archived: false,
             properties: {
               'prop2-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -368,7 +362,6 @@ describe('fetchPages()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop3-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -376,7 +369,6 @@ describe('fetchPages()', () => {
             id: 'page3-1'
           },
           {
-            archived: false,
             properties: {
               'prop3-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -423,7 +415,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next1',
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -431,7 +422,6 @@ describe('fetchPages()', () => {
             id: 'page1-1'
           },
           {
-            archived: false,
             properties: {
               'prop1-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -444,7 +434,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next2',
         results: [
           {
-            archived: false,
             properties: {
               'prop2-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -452,7 +441,6 @@ describe('fetchPages()', () => {
             id: 'page2-1'
           },
           {
-            archived: false,
             properties: {
               'prop2-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -464,7 +452,6 @@ describe('fetchPages()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop3-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -472,7 +459,6 @@ describe('fetchPages()', () => {
             id: 'page3-1'
           },
           {
-            archived: false,
             properties: {
               'prop3-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -519,7 +505,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next1',
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -527,7 +512,6 @@ describe('fetchPages()', () => {
             id: 'page1-1'
           },
           {
-            archived: false,
             properties: {
               'prop1-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -540,7 +524,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next2',
         results: [
           {
-            archived: false,
             properties: {
               'prop2-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -548,7 +531,6 @@ describe('fetchPages()', () => {
             id: 'page2-1'
           },
           {
-            archived: false,
             properties: {
               'prop2-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -560,7 +542,6 @@ describe('fetchPages()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop3-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -568,7 +549,6 @@ describe('fetchPages()', () => {
             id: 'page3-1'
           },
           {
-            archived: false,
             properties: {
               'prop3-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -615,7 +595,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next1',
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -623,7 +602,6 @@ describe('fetchPages()', () => {
             id: 'page1-1'
           },
           {
-            archived: false,
             properties: {
               'prop1-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -636,7 +614,6 @@ describe('fetchPages()', () => {
         next_cursor: 'next2',
         results: [
           {
-            archived: false,
             properties: {
               'prop2-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -644,7 +621,6 @@ describe('fetchPages()', () => {
             id: 'page2-1'
           },
           {
-            archived: false,
             properties: {
               'prop2-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -656,7 +632,6 @@ describe('fetchPages()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop3-1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -664,7 +639,6 @@ describe('fetchPages()', () => {
             id: 'page3-1'
           },
           {
-            archived: false,
             properties: {
               'prop3-2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop3-2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -749,7 +723,7 @@ describe('toContent()', () => {
 
   it('should generate content(empty properties)', async () => {
     const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
-      { results: [{ archived: false, properties: {}, id: 'page1' }] }
+      { results: [{ properties: {}, id: 'page1' }] }
     ]
     const mockClient = new MockClient({
       mockQueryDataSources
@@ -780,7 +754,6 @@ describe('toContent()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -788,7 +761,6 @@ describe('toContent()', () => {
             id: 'page1'
           },
           {
-            archived: false,
             properties: {
               'prop2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -832,7 +804,6 @@ describe('toContent()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop1-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -840,7 +811,6 @@ describe('toContent()', () => {
             id: 'page1'
           },
           {
-            archived: false,
             properties: {
               'prop2-1': { type: 'checkbox', checkbox: true, id: '' },
               'prop2-2': { type: 'checkbox', checkbox: true, id: '' }
@@ -884,7 +854,6 @@ describe('toContent()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1': { type: 'checkbox', checkbox: true, id: '' }
             },
@@ -922,7 +891,6 @@ describe('toContent()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               'prop1-1': { type: 'checkbox', checkbox: true, id: '' }
             },
@@ -986,7 +954,6 @@ describe('toContent()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               reject: { type: 'checkbox', checkbox: true, id: '' }
             },
@@ -1021,7 +988,6 @@ describe('toContent()', () => {
       {
         results: [
           {
-            archived: false,
             properties: {
               page1: { type: 'checkbox', checkbox: true, id: '' }
             },
