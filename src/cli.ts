@@ -36,7 +36,15 @@ type Opts = {
   toHtml?: boolean
   saveDir?: string
   saveFormat?: 'json' | 'html' | 'md'
-  outputTarget?: 'both' | 'props' | 'content'
+  outputTarget?:
+    | 'both'
+    | 'props:content'
+    | 'props:header'
+    | 'header:content'
+    | 'all'
+    | 'props'
+    | 'header'
+    | 'content'
   initialIndex?: number
   indexName?: string
   stdout: Writable
@@ -63,8 +71,20 @@ export function targetArray(
   if (outputTarget) {
     if (outputTarget == 'both') {
       return ['props', 'content']
-    } else {
-      return outputTarget === 'props' ? ['props'] : ['content']
+    } else if (outputTarget == 'props:content') {
+      return ['props', 'content']
+    } else if (outputTarget == 'props:header') {
+      return ['props', 'header']
+    } else if (outputTarget == 'header:content') {
+      return ['header', 'content']
+    } else if (outputTarget == 'all') {
+      return ['props', 'header', 'content']
+    } else if (outputTarget == 'props') {
+      return ['props']
+    } else if (outputTarget == 'header') {
+      return ['header']
+    } else if (outputTarget == 'content') {
+      return ['content']
     }
   }
 

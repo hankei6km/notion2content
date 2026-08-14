@@ -66,11 +66,19 @@ const envVarsPrefix =
         description: 'Save content to files as specified format'
       },
       'output-target': {
-        choices: ['both', 'props', 'content'] as const,
+        choices: [
+          'both',
+          'props:content',
+          'props:header',
+          'header:content',
+          'all',
+          'props',
+          'content'
+        ] as const,
         array: false,
         required: false,
         default: 'both' as const,
-        description: 'Select output trager'
+        description: 'Select output target'
       },
       'initial-index': {
         type: 'number',

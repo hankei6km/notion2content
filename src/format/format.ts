@@ -11,8 +11,17 @@ export async function toFrontmatterString(
   src: ContentRaw,
   _opts?: FormatOptions
 ): Promise<string> {
-  if (src.props) {
-    const s = matter.stringify('', src.props)
+  if (src.props || src.header) {
+    const q: { [key: string]: any } = {}
+    if (src.props && src.header) {
+      q.header = src.header // 確実ではないが、frontmatter にしたときにheader が先にくるような気がする。
+      q.props = src.props
+    } else if (src.props) {
+      Object.assign(q, src.props)
+    } else if (src.header) {
+      Object.assign(q, src.header)
+    }
+    const s = matter.stringify('', q)
     const l = s.length - 1
     const i = s.lastIndexOf('\n')
     if (i === l) {

@@ -5,6 +5,7 @@ import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoint
 import type { Child } from 'hastscript'
 import type { toMdast } from 'hast-util-to-mdast'
 import { PropsToItems } from './props.ts'
+import { HeaderToItems } from './header.ts'
 import { Chan } from 'chanpuru'
 import { blockToHast } from 'notion2hast'
 
@@ -98,10 +99,16 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
   // TODO: err 用 channle を検討
   const ch = new Chan<Promise<ContentRaw>>(opts.workersNum - 1)
   let err: Error | null = null
-  const outProps =
-    typeof inOpts.target === 'undefined' || inOpts.target.includes('props')
-  const outContent =
-    typeof inOpts.target === 'undefined' || inOpts.target.includes('content')
+  const outTarget = {
+    props: true,
+    header: false, // header は互換性のためにデフォルトで false にする
+    content: true
+  }
+  if (Array.isArray(inOpts.target)) {
+    outTarget.props = inOpts.target.includes('props')
+    outTarget.header = inOpts.target.includes('header')
+    outTarget.content = inOpts.target.includes('content')
+  }
   let index =
     typeof opts.toItemsOpts.initialIndex === 'number'
       ? opts.toItemsOpts.initialIndex
@@ -109,12 +116,13 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
 
   ;(async () => {
     const propsToItems = new PropsToItems()
+    const headerToItems = new HeaderToItems()
 
     try {
       for await (const page of fetchPages(client, opts)) {
         const p = (async (page: PageObjectResponse) => {
           const q: ContentRaw = { id: page.id }
-          if (outProps) {
+          if (outTarget.props) {
             q.props = await propsToItems.toItems(page.properties).catch((e) => {
               err = new Error(
                 `toContent: error from propsToItems.toItems: ${e}, data_source_id:${opts.query.data_source_id}, page_id:${page.id}`
@@ -125,7 +133,15 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
               q.props[opts.toItemsOpts.indexName] = index++
             }
           }
-          if (outContent) {
+          if (outTarget.header) {
+            q.header = await headerToItems.toItems(page).catch((e) => {
+              err = new Error(
+                `toContent: error from headerToItems.toItems: ${e}, data_source_id:${opts.query.data_source_id}, page_id:${page.id}`
+              )
+              return undefined
+            })
+          }
+          if (outTarget.content) {
             let content = await blockToHast(client as N2hClient, {
               block_id: page.id,
               ...opts.toHastOpts

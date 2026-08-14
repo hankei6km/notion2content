@@ -5,7 +5,7 @@ import type { RichTextItemResponse } from '@notionhq/client/build/src/api-endpoi
 import { PropsToItems } from '../../src/lib/props.ts'
 
 describe('propsToItems()', () => {
-  it('should convert enpty properties to empty items', async () => {
+  it('should convert empty properties to empty items', async () => {
     const propsToItems = new PropsToItems()
     assert.deepStrictEqual(await propsToItems.toItems({}), {})
     assert.deepStrictEqual(await propsToItems.toItems(undefined as any), {})

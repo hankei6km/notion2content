@@ -102,7 +102,11 @@ for await (const content of ite) {
 
 ##### `inOpts.target`
 
-`props` と `content` のどちらを変換するか配列で指定(同時にどちらも指定可能)
+変換する要素を配列で指定。以下のいずれかを記述(組みああわせて指定可能)。
+
+- `props`
+- `header`
+- `content`
 
 ##### `inOpts.workersNum`
 
@@ -158,6 +162,26 @@ index とは `toContent` が返す iterator から取得したときに `props` 
 - [x] people - [People property values](https://developers.notion.com/reference/property-item-object#people-property-values)を出力(`person` と `group` に対応、`null` と `undefined` は `''` へ変換される)
 - [x] relation - id の配列へ変換
 - [ ] rollup
+
+### Header
+
+- [x] id - plain text へ変換される
+- [x] created_time - plain text へ変換される
+- [x] last_edited_time - plain text へ変換される
+- [x] in_trash: boolean へ変換される
+- [x] is_archived: boolean へ変換される
+- [x] is_locked: boolean へ変換される
+- [x] url: plain text へ変換される
+- [x] public_url: plain text または `null` へ変換される
+- [x] icon: type に応じて変換される(`null` と `undefined` は `''` へ変換される)
+  - [x] icon -型がそのまま出力される
+  - [x] emoji - plain text へ変換される
+  - [x] file -url のみを出力
+  - [x] external -url のみを出力
+  - [x] custom_emoji -url のみを出力
+- [x] cover - url のみを出力(`null` と `undefined` は `''` へ変換される)
+- [x] created_by - id のみを出力(`null` と `undefined` は `''` へ変換される)
+- [x] last_edited_by - id のみを出力(`null` と `undefined` は `''` へ変換される)
 
 ### Blocks
 

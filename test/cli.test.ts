@@ -123,10 +123,15 @@ describe('contentToString()', () => {
 })
 
 describe('targetArray()', () => {
-  it('should return targe', () => {
+  it('should return target array', () => {
     assert.strictEqual(targetArray(undefined), undefined)
     assert.deepStrictEqual(targetArray('both'), ['props', 'content'])
+    assert.deepStrictEqual(targetArray('props:content'), ['props', 'content'])
+    assert.deepStrictEqual(targetArray('props:header'), ['props', 'header'])
+    assert.deepStrictEqual(targetArray('header:content'), ['header', 'content'])
+    assert.deepStrictEqual(targetArray('all'), ['props', 'header', 'content'])
     assert.deepStrictEqual(targetArray('props'), ['props'])
+    assert.deepStrictEqual(targetArray('header'), ['header'])
     assert.deepStrictEqual(targetArray('content'), ['content'])
   })
 })
