@@ -64,6 +64,40 @@ mock.module('../../src/lib/props.ts', {
   exports: mockPropsExports
 })
 
+const mockHeaderExports = (() => {
+  const mockHeaderToItemsInstance = {
+    toItems: mock.fn<(page: PageObjectResponse) => Promise<PropsItem>>()
+  }
+  const mockHeaderToItems = mock.fn(function () {})
+  const reset = () => {
+    mockHeaderToItemsInstance.toItems.mock.resetCalls()
+    mockHeaderToItemsInstance.toItems.mock.mockImplementation((page) => {
+      const props = Object.keys(page.properties).sort()
+      if (props.includes('reject')) {
+        return Promise.reject(`${props.join(',')}:toItems`)
+      }
+      const keys = Object.keys(page).sort()
+      return Promise.resolve({ check: `${keys.join(',')}` })
+    })
+    mockHeaderToItems.mock.resetCalls()
+    mockHeaderToItems.prototype.toItems = mockHeaderToItemsInstance.toItems
+    mockHeaderToItems.mock.mockImplementation(function () {})
+  }
+
+  reset()
+  return {
+    HeaderToItems: mockHeaderToItems,
+    _reset: reset,
+    _getMocks: () => ({
+      mockHeaderToItemsInstance,
+      mockHeaderToItems
+    })
+  }
+})()
+mock.module('../../src/lib/header.ts', {
+  exports: mockHeaderExports
+})
+
 const mockNotion2HastExports = (() => {
   const mockBlockToHast =
     mock.fn<
@@ -97,27 +131,15 @@ mock.module('notion2hast', {
   exports: mockNotion2HastExports
 })
 
-const mockProps = await import('../../src/lib/props.ts')
-const {
-  mockPropsToItemsInstance,
-  mockPropsToItems
-}: {
-  mockPropsToItemsInstance: {
-    toItems: Mock<
-      (props: PageObjectResponse['properties']) => Promise<PropsItem>
-    >
-  }
-  mockPropsToItems: Mock<(typeof mockProps)['PropsToItems']>
-} = (mockProps as any)._getMocks()
-const mockNotion2Hast = await import('notion2hast')
-const {
-  mockBlockToHast
-}: { mockBlockToHast: Mock<(typeof mockNotion2Hast)['blockToHast']> } = (
-  mockNotion2Hast as any
-)._getMocks()
+const { mockPropsToItemsInstance, mockPropsToItems } =
+  mockPropsExports._getMocks()
+const { mockHeaderToItemsInstance, mockHeaderToItems } =
+  mockHeaderExports._getMocks()
+const { mockBlockToHast } = mockNotion2HastExports._getMocks()
 afterEach(() => {
-  ;(mockProps as any)._reset()
-  ;(mockNotion2Hast as any)._reset()
+  mockPropsExports._reset()
+  mockHeaderExports._reset()
+  mockNotion2HastExports._reset()
 })
 
 const { normalizeOpts, toContent } =
@@ -718,6 +740,8 @@ describe('toContent()', () => {
     assert.deepStrictEqual(res, [])
     assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
     assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
     assert.strictEqual(mockBlockToHast.mock.callCount(), 0)
   })
 
@@ -746,6 +770,8 @@ describe('toContent()', () => {
     ])
     assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
     assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
     assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
   })
 
@@ -796,6 +822,8 @@ describe('toContent()', () => {
     ])
     assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
     assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 2)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
     assert.strictEqual(mockBlockToHast.mock.callCount(), 2)
   })
 
@@ -846,7 +874,50 @@ describe('toContent()', () => {
     ])
     assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
     assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 2)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
     assert.strictEqual(mockBlockToHast.mock.callCount(), 2)
+  })
+
+  it('should generate content(target header)', async () => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
+      {
+        results: [
+          {
+            properties: {
+              'prop1-1': { type: 'checkbox', checkbox: true, id: '' }
+            },
+            id: 'page1'
+          }
+        ]
+      }
+    ]
+    const mockClient = new MockClient({
+      mockQueryDataSources
+    })
+    const g = toContent(mockClient, {
+      target: ['header'],
+      query: { data_source_id: 'test_data_source' },
+      toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
+      toHastOpts: {}
+    })
+    const res = []
+    for await (const i of g) {
+      res.push(i)
+    }
+    assert.deepStrictEqual(res, [
+      {
+        id: 'page1',
+        header: {
+          check: 'id,properties'
+        }
+      }
+    ])
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 1)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 0)
   })
 
   it('should generate content(target props)', async () => {
@@ -883,6 +954,8 @@ describe('toContent()', () => {
     ])
     assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
     assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
     assert.strictEqual(mockBlockToHast.mock.callCount(), 0)
   })
 
@@ -920,6 +993,8 @@ describe('toContent()', () => {
     ])
     assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
     assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
     assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
   })
 
@@ -949,7 +1024,7 @@ describe('toContent()', () => {
     )
   })
 
-  it('should reject from toItems', async () => {
+  it('should reject from toItems(props)', async () => {
     const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
@@ -980,6 +1055,41 @@ describe('toContent()', () => {
       {
         message:
           'toContent: error from propsToItems.toItems: reject:toItems, data_source_id:test_data_source, page_id:page1'
+      }
+    )
+  })
+  it('should reject from toItems(header)', async () => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
+      {
+        results: [
+          {
+            properties: {
+              reject: { type: 'checkbox', checkbox: true, id: '' }
+            },
+            id: 'page1'
+          }
+        ]
+      }
+    ]
+    const mockClient = new MockClient({
+      mockQueryDataSources
+    })
+    const g = toContent(mockClient, {
+      target: ['header'],
+      query: { data_source_id: 'test_data_source' },
+      toItemsOpts: {},
+      toHastOpts: {}
+    })
+    const res = []
+    await assert.rejects(
+      async () => {
+        for await (const i of g) {
+          res.push(i)
+        }
+      },
+      {
+        message:
+          'toContent: error from headerToItems.toItems: reject:toItems, data_source_id:test_data_source, page_id:page1'
       }
     )
   })

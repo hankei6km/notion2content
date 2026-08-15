@@ -25,6 +25,25 @@ describe('toFrontmatterString()', () => {
       '---\ntest-key: test-value\n---\n'
     )
   })
+  it('should convert object to frontmatter string(header)', async () => {
+    assert.strictEqual(
+      await Format.toFrontmatterString({
+        id: 'test-id',
+        header: { id: 'test-id' }
+      }),
+      '---\nid: test-id\n---\n'
+    )
+  })
+  it('should convert object to frontmatter string(header and props)', async () => {
+    assert.strictEqual(
+      await Format.toFrontmatterString({
+        id: 'test-id',
+        header: { id: 'test-id' },
+        props: { 'test-key': 'test-value' }
+      }),
+      '---\nheader:\n  id: test-id\nprops:\n  test-key: test-value\n---\n'
+    )
+  })
 })
 
 describe('toHtmlString()', () => {
