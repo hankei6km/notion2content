@@ -195,6 +195,7 @@ describe('normalizeOpts()', () => {
       }),
       {
         target: ['props', 'content'],
+        pageObject: false,
         workersNum: 1,
         keepOrder: false,
         skip: 0,
@@ -212,6 +213,7 @@ describe('normalizeOpts()', () => {
       }),
       {
         target: ['props', 'content'],
+        pageObject: false,
         workersNum: 1,
         keepOrder: false,
         skip: 0,
@@ -229,6 +231,7 @@ describe('normalizeOpts()', () => {
       }),
       {
         target: ['props', 'content'],
+        pageObject: false,
         workersNum: 1,
         keepOrder: false,
         skip: 0,
@@ -959,7 +962,7 @@ describe('toContent()', () => {
     assert.strictEqual(mockBlockToHast.mock.callCount(), 0)
   })
 
-  it('should generate content(target contrent)', async () => {
+  it('should generate content(target content)', async () => {
     const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
         results: [
@@ -996,6 +999,52 @@ describe('toContent()', () => {
     assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
     assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
     assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
+  })
+
+  it('should generate content(pageObject)', async () => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
+      {
+        results: [
+          {
+            properties: {
+              'prop1-1': { type: 'checkbox', checkbox: true, id: '' }
+            },
+            id: 'page1'
+          }
+        ]
+      }
+    ]
+    const mockClient = new MockClient({
+      mockQueryDataSources
+    })
+    const g = toContent(mockClient, {
+      target: ['props'],
+      pageObject: true,
+      query: { data_source_id: 'test_data_source' },
+      toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
+      toHastOpts: {}
+    })
+    const res = []
+    for await (const i of g) {
+      res.push(i)
+    }
+    assert.deepStrictEqual(res, [
+      {
+        id: 'page1',
+        props: { 'test-index': 10, check: 'prop1-1' },
+        pageObject: {
+          id: 'page1',
+          properties: {
+            'prop1-1': { type: 'checkbox', checkbox: true, id: '' }
+          }
+        }
+      }
+    ])
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 0)
   })
 
   it('should reject from queryDataSources', async () => {

@@ -108,6 +108,10 @@ for await (const content of ite) {
 - `header`
 - `content`
 
+##### `inOpts.pageObject`
+
+受信したページオブジェクトを `pageObject` として保持するかどうか。なお、ページの block は含まれていない。また、Client が `queryDataSources` で取得したページオブジェクトをそのまま返すため、実装によっては結果が異なる場合もある。
+
 ##### `inOpts.workersNum`
 
 `content` の変換(child ブロックのフェッチ)を並行で行う数。

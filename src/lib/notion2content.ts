@@ -13,6 +13,7 @@ type Nodes = Parameters<typeof toMdast>[0]
 
 const defaultOpts: Required<ToContentOpts> = {
   target: ['props', 'content'],
+  pageObject: false,
   workersNum: 1,
   keepOrder: false,
   skip: 0,
@@ -166,6 +167,9 @@ export async function* toContent(client: Client, inOpts: ToContentOpts) {
               }
               q.content = content
             }
+          }
+          if (opts.pageObject) {
+            q.pageObject = page
           }
           return q
         })(page)
