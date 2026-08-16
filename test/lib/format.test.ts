@@ -44,6 +44,24 @@ describe('toFrontmatterString()', () => {
       '---\nheader:\n  id: test-id\nprops:\n  test-key: test-value\n---\n'
     )
   })
+  it('should not include pageObject in frontmatter', async () => {
+    assert.strictEqual(
+      await Format.toFrontmatterString({
+        id: 'test-id',
+        pageObject: { id: 'test-id' } as any
+      }),
+      '---\n---\n'
+    )
+    assert.strictEqual(
+      await Format.toFrontmatterString({
+        id: 'test-id',
+        header: { id: 'test-id' },
+        props: { 'test-key': 'test-value' },
+        pageObject: { id: 'test-id' } as any
+      }),
+      '---\nheader:\n  id: test-id\nprops:\n  test-key: test-value\n---\n'
+    )
+  })
 })
 
 describe('toHtmlString()', () => {

@@ -11,6 +11,7 @@ export type OutputTarget = 'header' | 'props' | 'content'
 
 export type ToContentOpts = {
   target?: OutputTarget[]
+  pageObject?: boolean
   workersNum?: number
   keepOrder?: boolean
   skip?: number
@@ -78,4 +79,5 @@ export type ContentRaw = {
   props?: PropsItem
   header?: HeaderItem
   content?: Nodes
+  pageObject?: PageObjectResponse
 }
