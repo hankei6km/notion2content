@@ -34,8 +34,9 @@
   "dependencies": {
     "@notionhq/client": "^5.24.0",
     "chanpuru": "^0.2.2",
-    "gray-matter": "^4.0.3",
     "hast-util-to-mdast": "^10.1.0",
+    "js-yaml": "^5.3.0",
+    "mdast-util-frontmatter": "^2.0.1",
     "mdast-util-gfm": "^3.0.0",
     "mdast-util-to-markdown": "^2.1.0",
     "notion2hast": "^0.2.0",
