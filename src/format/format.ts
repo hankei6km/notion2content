@@ -1,4 +1,5 @@
-import matter from 'gray-matter'
+import { dump } from 'js-yaml'
+import { frontmatterToMarkdown } from 'mdast-util-frontmatter'
 import { toHtml as hastToHtml } from 'hast-util-to-html'
 import { toMdast as hastToMdast } from 'hast-util-to-mdast'
 import { toMarkdown as mdastToMarkdown } from 'mdast-util-to-markdown'
@@ -21,16 +22,41 @@ export async function toFrontmatterString(
     } else if (src.header) {
       Object.assign(q, src.header)
     }
-    const s = matter.stringify('', q)
-    const l = s.length - 1
-    const i = s.lastIndexOf('\n')
-    if (i === l) {
-      return s.slice(0, l)
-    }
-    // gray-matter の挙動が変更されないかぎり、ここに到達することはない
-    return s
+    const yaml = dump(q).slice(0, -1)
+    /*let yaml = dump(q)
+    const l = yaml.length - 1
+    if (yaml[l] === '\n') {
+      yaml = yaml.slice(0, l)
+    }*/
+    return mdastToMarkdown(
+      {
+        type: 'root' as const,
+        children: [
+          {
+            type: 'yaml' as const,
+            value: yaml
+          }
+        ]
+      },
+      {
+        extensions: [frontmatterToMarkdown(['yaml'])]
+      }
+    )
   }
-  return '---\n---\n'
+  return mdastToMarkdown(
+    {
+      type: 'root' as const,
+      children: [
+        {
+          type: 'yaml' as const,
+          value: ''
+        }
+      ]
+    },
+    {
+      extensions: [frontmatterToMarkdown(['yaml'])]
+    }
+  )
 }
 
 export async function toHtmlString(
