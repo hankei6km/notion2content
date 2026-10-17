@@ -39,7 +39,7 @@
     "mdast-util-frontmatter": "^2.0.1",
     "mdast-util-gfm": "^3.0.0",
     "mdast-util-to-markdown": "^2.1.0",
-    "notion2hast": "^0.2.0",
+    "notion2hast": "^0.3.0",
     "yargs": "^18.0.0"
   },
   "devDependencies": {
