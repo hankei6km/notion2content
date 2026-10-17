@@ -1001,6 +1001,53 @@ describe('toContent()', () => {
     assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
   })
 
+  it('should generate content(target content with custom builders)', async () => {
+    const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
+      {
+        results: [
+          {
+            properties: {
+              'prop1-1': { type: 'checkbox', checkbox: true, id: '' }
+            },
+            id: 'page1'
+          }
+        ]
+      }
+    ]
+    const mockClient = new MockClient({
+      mockQueryDataSources
+    })
+    const g = toContent(mockClient, {
+      target: ['content'],
+      query: { data_source_id: 'test_data_source' },
+      toItemsOpts: { indexName: 'test-index', initialIndex: 10 },
+      toHastOpts: {
+        customBuilders: {
+          block: {}
+        }
+      }
+    })
+    const res = []
+    for await (const i of g) {
+      res.push(i)
+    }
+    assert.deepStrictEqual(res, [
+      {
+        id: 'page1',
+        content: getMockTree('page1')
+      }
+    ])
+    assert.strictEqual(mockPropsToItems.mock.callCount(), 1)
+    assert.strictEqual(mockPropsToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockHeaderToItems.mock.callCount(), 1)
+    assert.strictEqual(mockHeaderToItemsInstance.toItems.mock.callCount(), 0)
+    assert.strictEqual(mockBlockToHast.mock.callCount(), 1)
+    assert.deepStrictEqual(mockBlockToHast.mock.calls[0].arguments[1], {
+      block_id: 'page1',
+      customBuilders: { block: {} }
+    })
+  })
+
   it('should generate content(pageObject)', async () => {
     const mockQueryDataSources: MockClientOpts['mockQueryDataSources'] = [
       {
